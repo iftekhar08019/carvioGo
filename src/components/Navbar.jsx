@@ -36,14 +36,14 @@ const Navbar = () => {
   }, []);
 
   const commonLinks = [
-    { name: "Home", href: "#" },
-    { name: "Available Cars", href: "#" },
+    { name: "Home", href: "/" },
+    { name: "Available Cars", href: "/available-cars" },
   ];
 
   const loggedInLinks = [
-    { name: "Add Car", href: "#" },
-    { name: "My Cars", href: "#" },
-    { name: "My Bookings", href: "#" },
+    { name: "Add Car", href: "/add-car" },
+    { name: "My Cars", href: "/my-cars" },
+    { name: "My Bookings", href: "/my-bookings" },
   ];
 
   const renderLinks = () => {
