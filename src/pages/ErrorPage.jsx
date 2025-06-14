@@ -1,17 +1,31 @@
-import React from 'react';
+import React from "react";
+import { Link } from "react-router";
+import Lottie from "lottie-react";
+import carAnimation from "../assets/car.json"; 
 
 const ErrorPage = () => {
-    return (
-        <div>
-            <div className="flex items-center justify-center h-screen bg-gray-100">
-                <div className="text-center">
-                    <h1 className="text-6xl font-bold text-red-600">404</h1>
-                    <p className="mt-4 text-xl text-gray-700">Page Not Found</p>
-                    <p className="mt-2 text-gray-500">The page you are looking for does not exist.</p>
-                </div>
-            </div>
-        </div>
-    );
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-white px-4 text-center">
+      {/* Lottie Animation */}
+      <div className="w-full max-w-md">
+        <Lottie animationData={carAnimation} loop={true} />
+      </div>
+
+      {/* Error Message */}
+      <h1 className="text-4xl font-bold text-gray-800 mt-6">404 - Page Not Found</h1>
+      <p className="text-gray-500 mt-2">
+        Oops! The page you are looking for doesn’t exist.
+      </p>
+
+      {/* Back to Home */}
+      <Link
+        to="/"
+        className="mt-6 inline-block px-6 py-3 bg-blue-500 text-white font-semibold rounded-xl hover:bg-blue-600 transition duration-300"
+      >
+        Back to Home
+      </Link>
+    </div>
+  );
 };
 
 export default ErrorPage;
