@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import logo from "../assets/logo.png";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../provider/AuthProvider";
 
 const Navbar = () => {
@@ -83,13 +83,13 @@ const Navbar = () => {
         {/* Desktop Right Auth Buttons */}
         <div className="hidden lg:flex items-center gap-3 ml-auto">
           {user ? (
-            <button onClick={handleLogout} className="text-sm text-red-500 font-bold hover:text-red-700">
+            <button onClick={handleLogout} className="bg-white hover:bg-gray-100 text-red-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
               Logout
             </button>
           ) : (
             <>
-              <a className="py-2 px-4 bg-gray-50 hover:bg-gray-100 text-sm text-gray-900 font-bold rounded-xl" href="#">Sign In</a>
-              <a className="py-2 px-4 bg-blue-500 hover:bg-blue-600 text-sm text-white font-bold rounded-xl" href="#">Sign Up</a>
+              <Link className="py-2 px-4 bg-gray-50 hover:bg-gray-100 text-sm text-gray-900 font-bold rounded-xl" to={"/login"}>Sign In</Link>
+              <Link className="py-2 px-4 bg-blue-500 hover:bg-blue-600 text-sm text-white font-bold rounded-xl" to={"/register"}>Sign Up</Link>
             </>
           )}
         </div>
@@ -127,7 +127,7 @@ const Navbar = () => {
 
           <div className="mt-auto pt-6">
             {user ? (
-              <button onClick={handleLogout} className="w-full text-left px-4 py-3 text-sm font-semibold text-red-500 hover:bg-red-50 hover:text-red-700 rounded">
+              <button onClick={handleLogout} className="bg-white hover:bg-gray-100 text-red-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
                 Logout
               </button>
             ) : (
