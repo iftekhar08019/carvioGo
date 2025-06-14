@@ -51,7 +51,7 @@ const Navbar = () => {
     return allLinks.map((link, index) => (
       <React.Fragment key={link.name}>
         <li>
-          <a className="text-sm text-gray-400 hover:text-gray-500" href={link.href}>
+          <a className="text-sm text-black hover:text-gray-500" href={link.href}>
             {link.name}
           </a>
         </li>
@@ -70,10 +70,10 @@ const Navbar = () => {
     <div className="bg-blue-500">
       <nav className="relative px-4 py-4 flex items-center bg-white justify-between">
         {/* Logo */}
-        <a className="text-3xl font-bold leading-none flex items-center gap-2" href="#">
+        <Link to={"/"} className="text-3xl font-bold leading-none flex items-center gap-2">
           <img className="w-10" src={logo} alt="Logo" />
           <h1 className="text-xl">Carvio<span className="text-yellow-800">GO</span></h1>
-        </a>
+        </Link>
 
         {/* Center Nav Menu */}
         <ul className="hidden lg:flex lg:items-center lg:space-x-6 absolute left-1/2 transform -translate-x-1/2">
@@ -115,7 +115,7 @@ const Navbar = () => {
               Carvio<span className="text-yellow-800">GO</span>
             </a>
             <button className="navbar-close">
-              <svg className="h-6 w-6 text-gray-400 hover:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-6 w-6 text-black hover:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -136,7 +136,7 @@ const Navbar = () => {
                 <a className="flex-1 px-4 py-3 text-center bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl" href="#">Sign Up</a>
               </div>
             )}
-            <p className="my-4 text-xs text-center text-gray-400">© 2025 CarvioGO</p>
+            <p className="my-4 text-xs text-center text-black">© 2025 CarvioGO</p>
           </div>
         </nav>
       </div>
