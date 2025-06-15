@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1,
+    "car_image": "https://stimg.cardekho.com/images/carexteriorimages/630x420/Skoda/Kylaq/11528/1733225175669/front-left-side-47.jpg?impolicy=resize&imwidth=480",
+    "model": "Toyota Camry 2023",
+    "daily_price": "$45/day",
+    "availability": "Available",
+    "booking_count": 12,
+    "date_posted": "Added 2 days ago"
+  },
+  {
+    "id": 2,
+    "car_image": "https://stimg.cardekho.com/images/carexteriorimages/630x420/Skoda/Kylaq/11528/1733225175669/front-left-side-47.jpg?impolicy=resize&imwidth=480",
+    "model": "Honda Accord 2022",
+    "daily_price": "$50/day",
+    "availability": "Available",
+    "booking_count": 8,
+    "date_posted": "Added 5 days ago"
+  },
+  {
+    "id": 3,
+    "car_image": "https://stimg.cardekho.com/images/carexteriorimages/630x420/Skoda/Kylaq/11528/1733225175669/front-left-side-47.jpg?impolicy=resize&imwidth=480",
+    "model": "Hyundai Elantra 2023",
+    "daily_price": "$42/day",
+    "availability": "Unavailable",
+    "booking_count": 15,
+    "date_posted": "Added 1 day ago"
+  },
+  {
+    "id": 4,
+    "car_image": "https://stimg.cardekho.com/images/carexteriorimages/630x420/Skoda/Kylaq/11528/1733225175669/front-left-side-47.jpg?impolicy=resize&imwidth=480",
+    "model": "Nissan Altima 2021",
+    "daily_price": "$40/day",
+    "availability": "Available",
+    "booking_count": 20,
+    "date_posted": "Added 7 days ago"
+  },
+  {
+    "id": 5,
+    "car_image": "https://stimg.cardekho.com/images/carexteriorimages/630x420/Skoda/Kylaq/11528/1733225175669/front-left-side-47.jpg?impolicy=resize&imwidth=480",
+    "model": "Ford Fusion 2020",
+    "daily_price": "$38/day",
+    "availability": "Unavailable",
+    "booking_count": 5,
+    "date_posted": "Added 10 days ago"
+  },
+  {
+    "id": 6,
+    "car_image": "https://stimg.cardekho.com/images/carexteriorimages/630x420/Skoda/Kylaq/11528/1733225175669/front-left-side-47.jpg?impolicy=resize&imwidth=480",
+    "model": "Chevrolet Malibu 2023",
+    "daily_price": "$44/day",
+    "availability": "Available",
+    "booking_count": 9,
+    "date_posted": "Added 3 days ago"
+  }
+]
