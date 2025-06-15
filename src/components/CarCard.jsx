@@ -6,7 +6,7 @@ const CarCard = ({
   car
 }) => {
 const navigate = useNavigate();
-const { id: carId, model, daily_price, availability, booking_count, date_posted, car_image } = car || {};
+const { id: carId, model, daily_price, availability, date_posted, car_image } = car || {};
 
 return (
     <div className="card bg-base-100 w-80 shadow-sm transition-transform duration-300 hover:scale-110 mt-6 ">
