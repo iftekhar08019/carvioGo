@@ -6,12 +6,12 @@ const RecentList = () => {
   const [cars, setCars] = useState([]);
 
   useEffect(() => {
-    fetch("/cars.json")
+    fetch("http://localhost:3000/top-cars")
       .then((res) => res.json())
       .then((data) => {
         setCars(data);
       })
-      .catch((err) => console.error("Failed to load recipes:", err));
+      .catch((err) => console.error("Failed to load cars:", err));
   }, []);
 
   return (
@@ -21,7 +21,7 @@ const RecentList = () => {
       </h1>
       <div className="lg:w-10/12 mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {cars.map((car) => (
-          <CarCard key={car.id} car={car} />
+          <CarCard key={car._id} car={car} />
         ))}
       </div>
       <div className="card-actions mt-10">
