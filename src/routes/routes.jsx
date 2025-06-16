@@ -7,6 +7,7 @@ import ErrorPage from "../pages/ErrorPage";
 import Login from "../pages/Login";
 import Registration from "../pages/Registration";
 import AddCarPage from "../pages/AddCar";
+import MyCars from "../pages/MyCars";
 
 const router = createBrowserRouter([
   {
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
       {
         path: "/add-car",
         element: <AddCarPage />,
+      },
+            {
+        path: "/my-cars",
+        element: <MyCars />,
       },
     ],
   },
