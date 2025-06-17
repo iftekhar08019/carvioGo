@@ -132,8 +132,8 @@ const Navbar = () => {
               </button>
             ) : (
               <div className="flex gap-2">
-                <a className="flex-1 px-4 py-3 text-center bg-gray-50 hover:bg-gray-100 text-sm font-semibold rounded-xl" href="#">Sign In</a>
-                <a className="flex-1 px-4 py-3 text-center bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl" href="#">Sign Up</a>
+                <a className="flex-1 px-4 py-3 text-center bg-gray-50 hover:bg-gray-100 text-sm font-semibold rounded-xl" href="/login">Sign In</a>
+                <a className="flex-1 px-4 py-3 text-center bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl" href="/register">Sign Up</a>
               </div>
             )}
             <p className="my-4 text-xs text-center text-black">© 2025 CarvioGO</p>

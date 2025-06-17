@@ -13,7 +13,7 @@ const AvailableCars = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch("http://localhost:3000/cars?availability=Available", {
+    fetch("https://carvio-go-server.vercel.app/available-cars", {
       credentials: "include",
     })
       .then((res) => res.json())

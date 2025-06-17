@@ -18,7 +18,7 @@ const CarDetails = () => {
 
   useEffect(() => {
     // Fetch the car details using the car ID
-    fetch(`http://localhost:3000/cars/${id}`, {
+    fetch(`https://carvio-go-server.vercel.app/cars/${id}`, {
       credentials: "include",
     })
       .then((res) => res.json())
@@ -47,7 +47,7 @@ const CarDetails = () => {
       }
 
       // Check if the user has already booked the car
-      const res = await fetch(`http://localhost:3000/cars/${id}/booking`, {
+      const res = await fetch(`https://carvio-go-server.vercel.app/cars/${id}/booking`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

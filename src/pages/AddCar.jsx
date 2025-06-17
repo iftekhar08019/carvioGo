@@ -45,7 +45,7 @@ const AddCarPage = () => {
     };
 
     try {
-      const res = await fetch("http://localhost:3000/cars", {
+      const res = await fetch("https://carvio-go-server.vercel.app/cars", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(carData),

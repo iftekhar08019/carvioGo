@@ -50,7 +50,7 @@ const Registration = () => {
       // 2. Get JWT token from Firebase
       const idToken = await user.getIdToken();
       // 3. Call backend to verify, set HTTP-only cookie, and create user record
-      const response = await fetch("http://localhost:3000/login", {
+      const response = await fetch("https://carvio-go-server.vercel.app/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include", // crucial for http-only cookies
@@ -74,7 +74,7 @@ const Registration = () => {
       // 1. Get Firebase JWT
       const idToken = await user.getIdToken();
       // 2. Send token to backend login endpoint (creates user/cookie)
-      const response = await fetch("http://localhost:3000/login", {
+      const response = await fetch("https://carvio-go-server.vercel.app/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

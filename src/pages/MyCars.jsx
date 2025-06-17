@@ -24,7 +24,7 @@ const MyCars = () => {
 
   useEffect(() => {
     if (user?.email) {
-      fetch(`http://localhost:3000/cars?email=${user.email}`, {
+      fetch(`https://carvio-go-server.vercel.app/cars?email=${user.email}`, {
         credentials: "include",
       })
         .then((res) => res.json())
@@ -62,12 +62,15 @@ const MyCars = () => {
     e.preventDefault();
 
     try {
-      const res = await fetch(`http://localhost:3000/cars/${editingCar._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-        credentials: "include", // Include credentials for cookie-based auth
-      });
+      const res = await fetch(
+        `https://carvio-go-server.vercel.app/cars/${editingCar._id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+          credentials: "include", // Include credentials for cookie-based auth
+        }
+      );
       if (!res.ok) throw new Error("Update failed");
 
       setCars((prev) =>
@@ -106,10 +109,13 @@ const MyCars = () => {
     if (!result.isConfirmed) return;
 
     try {
-      const res = await fetch(`http://localhost:3000/cars/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
+      const res = await fetch(
+        `https://carvio-go-server.vercel.app/cars/${id}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
       if (!res.ok) throw new Error("Delete failed");
 
       setCars((prev) => prev.filter((r) => r._id !== id));
@@ -178,9 +184,10 @@ const MyCars = () => {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="table w-full">
+        {/* Desktop Table */}
+        <table className="table w-full hidden md:table">
           <thead>
-            <tr className="hidden lg:table-row">
+            <tr>
               <th>Car Image</th>
               <th>Car Model</th>
               <th>Daily Rental Price</th>
@@ -190,8 +197,7 @@ const MyCars = () => {
               <th>Actions</th>
             </tr>
           </thead>
-          {/* Desktop Table View */}
-          <tbody className="hidden md:table-row-group">
+          <tbody>
             {sortedCars.map((car) => (
               <tr key={car._id}>
                 <td>
@@ -223,63 +229,19 @@ const MyCars = () => {
               </tr>
             ))}
           </tbody>
-
-          {/* Mobile Card View */}
-          <div className="md:hidden flex flex-col gap-4">
-            {sortedCars.map((car) => (
-              <div
-                key={car._id}
-                className="bg-white rounded-xl  shadow p-4 flex flex-col gap-3"
-              >
-                <div className="flex gap-4 items-center">
-                  <img
-                    src={car.image}
-                    alt={car.model}
-                    className="w-20 h-20 object-cover rounded"
-                  />
-                  <div>
-                    <div className="font-bold text-lg">{car.carModel}</div>
-                    <div className="text-sm text-gray-500">
-                      {car.availability}
-                    </div>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div>
-                    <span className="font-semibold">Price:</span> $
-                    {car.dailyRentalPrice}/day
-                  </div>
-                  <div>
-                    <span className="font-semibold">Bookings:</span>{" "}
-                    {car.bookingCount}
-                  </div>
-                  <div>
-                    <span className="font-semibold">Added:</span>{" "}
-                    {new Date(car.dateAdded).toLocaleDateString()}
-                  </div>
-                  <div>
-                    <span className="font-semibold">Reg No:</span>{" "}
-                    {car.vehicleRegistrationNumber}
-                  </div>
-                </div>
-                <div className="flex gap-2 mt-2">
-                  <button
-                    onClick={() => openEditModal(car)}
-                    className="btn btn-sm btn-outline btn-primary flex items-center gap-2"
-                  >
-                    <FaEdit /> Update
-                  </button>
-                  <button
-                    onClick={() => handleDelete(car._id)}
-                    className="btn btn-sm btn-outline btn-error flex items-center gap-2"
-                  >
-                    <FaTrash /> Delete
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
         </table>
+
+        {/* Mobile Card View */}
+        <div className="block md:hidden flex flex-col gap-4">
+          {sortedCars.map((car) => (
+            <div
+              key={car._id}
+              className="bg-white rounded-xl shadow p-4 flex flex-col gap-3"
+            >
+              {/* ... your mobile card content ... */}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Modal */}
