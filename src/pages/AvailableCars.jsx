@@ -1,21 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { FaTh, FaListUl } from "react-icons/fa";
+import Loading from "../components/Loading";
 
 const AvailableCars = () => {
   const [cars, setCars] = useState([]);
   const [view, setView] = useState("grid");
   const [sortOption, setSortOption] = useState("dateDesc");
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://localhost:3000/cars?availability=Available")
+    setLoading(true);
+    fetch("http://localhost:3000/cars?availability=Available", {
+      credentials: "include",
+    })
       .then((res) => res.json())
       .then((data) => setCars(data))
-      .catch((err) => console.error("Failed to load cars:", err));
+      .catch((err) => console.error("Failed to load cars:", err))
+      .finally(() => setLoading(false));
   }, []);
 
+  if (loading) return <Loading />;
   // Handle search input
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -81,48 +88,96 @@ const AvailableCars = () => {
       </div>
 
       {/* Car List/Grid */}
-      <div className={view === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" : "flex flex-col gap-6"}>
+      <div
+        className={
+          view === "grid"
+            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+            : "flex flex-col gap-6"
+        }
+      >
         {sorted.length > 0 ? (
           sorted.map((car) => (
             <div
               key={car._id}
-              className={`card ${view === "grid" ? "w-80" : "w-full"} shadow-sm transition-transform duration-300 hover:scale-105 mt-6`}
+              className={`card ${
+                view === "grid" ? "w-80" : "w-full"
+              } shadow-sm transition-transform duration-300 hover:scale-105 mt-6`}
             >
               {view === "list" ? (
                 <div className="flex items-center p-4">
                   <div className="w-1/3">
                     <img
-                      src={car.image || "https://via.placeholder.com/384x216?text=No+Image"}
+                      src={
+                        car.image ||
+                        "https://via.placeholder.com/384x216?text=No+Image"
+                      }
                       alt={car.carModel}
                       className="rounded-xl object-cover w-full h-48"
                     />
                   </div>
                   <div className="w-2/3 pl-6">
                     <h2 className="card-title">{car.carModel}</h2>
-                    <p className="text-sm text-gray-600">Price: ${car.dailyRentalPrice}/day</p>
-                    <p className={`text-sm ${car.availability === "Available" ? "text-green-600" : "text-red-600"}`}>{car.availability}</p>
-                    <p className="text-xs text-gray-500">Location: {car.location}</p>
+                    <p className="text-sm text-gray-600">
+                      Price: ${car.dailyRentalPrice}/day
+                    </p>
+                    <p
+                      className={`text-sm ${
+                        car.availability === "Available"
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }`}
+                    >
+                      {car.availability}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Location: {car.location}
+                    </p>
                     <div className="card-actions mt-4">
-                      <button onClick={() => navigate(`/cars/${car._id}`)} className="btn btn-primary">Book Now</button>
+                      <button
+                        onClick={() => navigate(`/cars/${car._id}`)}
+                        className="btn btn-primary"
+                      >
+                        Book Now
+                      </button>
                     </div>
                   </div>
                 </div>
               ) : (
-                <>                
+                <>
                   <figure className="px-10 pt-10">
                     <img
-                      src={car.image || "https://via.placeholder.com/384x216?text=No+Image"}
+                      src={
+                        car.image ||
+                        "https://via.placeholder.com/384x216?text=No+Image"
+                      }
                       alt={car.carModel}
                       className="rounded-xl object-cover w-full h-48"
                     />
                   </figure>
                   <div className="card-body text-center">
                     <h2 className="card-title">{car.carModel}</h2>
-                    <p className="text-sm text-gray-600">Price: ${car.dailyRentalPrice}/day</p>
-                    <p className={`text-sm ${car.availability === "Available" ? "text-green-600" : "text-red-600"}`}>{car.availability}</p>
-                    <p className="text-xs text-gray-500">Location: {car.location}</p>
+                    <p className="text-sm text-gray-600">
+                      Price: ${car.dailyRentalPrice}/day
+                    </p>
+                    <p
+                      className={`text-sm ${
+                        car.availability === "Available"
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }`}
+                    >
+                      {car.availability}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Location: {car.location}
+                    </p>
                     <div className="card-actions mt-4">
-                      <button onClick={() => navigate(`/cars/${car._id}`)} className="btn btn-primary">Book Now</button>
+                      <button
+                        onClick={() => navigate(`/cars/${car._id}`)}
+                        className="btn btn-primary"
+                      >
+                        Book Now
+                      </button>
                     </div>
                   </div>
                 </>
@@ -130,7 +185,9 @@ const AvailableCars = () => {
             </div>
           ))
         ) : (
-          <p className="text-center text-gray-500 col-span-full">No cars match your search.</p>
+          <p className="text-center text-gray-500 col-span-full">
+            No cars match your search.
+          </p>
         )}
       </div>
     </div>

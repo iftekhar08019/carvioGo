@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useContext } from "react";
-import { FaCar, FaDollarSign, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import {
+  FaCar,
+  FaDollarSign,
+  FaCheckCircle,
+  FaTimesCircle,
+} from "react-icons/fa";
 import { useParams } from "react-router";
 import { AuthContext } from "../provider/AuthProvider";
 import Swal from "sweetalert2";
@@ -13,7 +18,9 @@ const CarDetails = () => {
 
   useEffect(() => {
     // Fetch the car details using the car ID
-    fetch(`http://localhost:3000/cars/${id}`)
+    fetch(`http://localhost:3000/cars/${id}`, {
+      credentials: "include",
+    })
       .then((res) => res.json())
       .then((data) => setCar(data))
       .catch((err) => console.error("Failed to fetch car details:", err));
@@ -27,73 +34,79 @@ const CarDetails = () => {
     setIsModalOpen(false);
   };
 
-const handleBooking = async () => {
-  try {
-    const userEmail = user?.email;
-    if (!userEmail) {
-      Swal.fire({
-        icon: "error",
-        title: "Not Logged In",
-        text: "You need to be logged in to book a car.",
-      });
-      return;
-    }
-
-    // Check if the user has already booked the car
-    const res = await fetch(`http://localhost:3000/cars/${id}/booking`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userEmail }), // Pass the userEmail in the request body
-    });
-
-    if (!res.ok) {
-      const error = await res.text();
-      if (error === "You have already booked this car") {
+  const handleBooking = async () => {
+    try {
+      const userEmail = user?.email;
+      if (!userEmail) {
         Swal.fire({
           icon: "error",
-          title: "Booking Failed",
-          text: "You have already booked this car.",
+          title: "Not Logged In",
+          text: "You need to be logged in to book a car.",
         });
         return;
-      } else {
-        throw new Error("Booking failed");
       }
+
+      // Check if the user has already booked the car
+      const res = await fetch(`http://localhost:3000/cars/${id}/booking`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userEmail }), // Pass the userEmail in the request body
+        credentials: "include", // Include credentials for cookie-based auth
+      });
+
+      if (!res.ok) {
+        const error = await res.text();
+        if (error === "You have already booked this car") {
+          Swal.fire({
+            icon: "error",
+            title: "Booking Failed",
+            text: "You have already booked this car.",
+          });
+          return;
+        } else {
+          throw new Error("Booking failed");
+        }
+      }
+
+      const data = await res.json();
+      setCar((prevCar) => ({
+        ...prevCar,
+        bookingCount: data.bookingCount,
+      }));
+
+      Swal.fire({
+        icon: "success",
+        title: "Booking Confirmed",
+        text: "Your car has been successfully booked.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+
+      closeBookingModal();
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        icon: "error",
+        title: "Booking Failed",
+        text: "Failed to book the car. Please try again.",
+      });
     }
-
-    const data = await res.json();
-    setCar((prevCar) => ({
-      ...prevCar,
-      bookingCount: data.bookingCount,
-    }));
-
-    Swal.fire({
-      icon: "success",
-      title: "Booking Confirmed",
-      text: "Your car has been successfully booked.",
-      timer: 2000,
-      showConfirmButton: false,
-    });
-
-    closeBookingModal();
-  } catch (error) {
-    console.error(error);
-    Swal.fire({
-      icon: "error",
-      title: "Booking Failed",
-      text: "Failed to book the car. Please try again.",
-    });
-  }
-};
-
-
-
-
+  };
 
   if (!car) return <p className="text-center p-10">Loading car details...</p>;
 
-  const { carModel, dailyRentalPrice, availability, features, description, image, location, bookingCount } = car;
+  const {
+    carModel,
+    dailyRentalPrice,
+    availability,
+    features,
+    description,
+    image,
+    location,
+    bookingCount,
+  } = car;
 
   return (
     <div className="bg-gray-100 min-h-screen p-6">
@@ -121,8 +134,18 @@ const handleBooking = async () => {
             </p>
 
             <div className="flex items-center gap-4 mb-4">
-              <p className={`text-sm flex items-center gap-2 ${availability === "Available" ? "text-green-600" : "text-red-600"}`}>
-                {availability === "Available" ? <FaCheckCircle /> : <FaTimesCircle />}
+              <p
+                className={`text-sm flex items-center gap-2 ${
+                  availability === "Available"
+                    ? "text-green-600"
+                    : "text-red-600"
+                }`}
+              >
+                {availability === "Available" ? (
+                  <FaCheckCircle />
+                ) : (
+                  <FaTimesCircle />
+                )}
                 {availability}
               </p>
             </div>
@@ -132,7 +155,10 @@ const handleBooking = async () => {
               <ul className="flex flex-wrap gap-3">
                 {features?.length > 0 ? (
                   features.map((feature, index) => (
-                    <li key={index} className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
+                    <li
+                      key={index}
+                      className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm"
+                    >
                       {feature}
                     </li>
                   ))
@@ -155,7 +181,8 @@ const handleBooking = async () => {
 
             <div className="mb-6">
               <p className="text-sm text-gray-600">
-                <span className="font-semibold">Booking Count:</span> {bookingCount}
+                <span className="font-semibold">Booking Count:</span>{" "}
+                {bookingCount}
               </p>
             </div>
 
@@ -199,13 +226,14 @@ const handleBooking = async () => {
                 <p className="text-lg font-semibold">
                   Price Per Day: ${dailyRentalPrice}
                 </p>
-                <p className="text-lg font-semibold">
-                  Location: {location}
-                </p>
+                <p className="text-lg font-semibold">Location: {location}</p>
               </div>
 
               <div className="flex justify-end gap-4">
-                <button onClick={closeBookingModal} className="btn btn-secondary">
+                <button
+                  onClick={closeBookingModal}
+                  className="btn btn-secondary"
+                >
                   Cancel
                 </button>
                 <button onClick={handleBooking} className="btn btn-primary">

@@ -11,47 +11,65 @@ import MyCars from "../pages/MyCars";
 import CarDetails from "../pages/CarDetails";
 import AvailableCars from "../pages/AvailableCars";
 import BookingPage from "../pages/BookingPage";
+import PrivateRoute from "../provider/PrivateRoute";
+
 
 const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <MainLayout />,
-    errorElement: <ErrorPage />,
-    children: [
-      {
-        index: true,
-        element: <Home />,
-      },
-      {
-        path: "login",
-        element: <Login />,
-      },
-      {
-        path: "register",
-        element: <Registration />,
-      },
-      {
-        path: "/add-car",
-        element: <AddCarPage />,
-      },
-        {
-        path: "/my-cars",
-        element: <MyCars />,
-      },
-           {
-        path: "/cars/:id",
-        element: <CarDetails />,
-      },
-               {
-        path: "/available-cars",
-        element: <AvailableCars />,
-      },
-                   {
-        path: "/my-bookings",
-        element: <BookingPage />,
-      },
-    ],
-  },
+    {
+        path: "/",
+        element: <MainLayout />,
+        errorElement: <ErrorPage />,
+        children: [
+            {
+                index: true,
+                element: <Home />,
+            },
+            {
+                path: "login",
+                element: <Login />,
+            },
+            {
+                path: "register",
+                element: <Registration />,
+            },
+            {
+                path: "/add-car",
+                element: (
+                    <PrivateRoute>
+                        <AddCarPage />
+                    </PrivateRoute>
+                ),
+            },
+            {
+                path: "/my-cars",
+                element: (
+                    <PrivateRoute>
+                        <MyCars />
+                    </PrivateRoute>
+                ),
+            },
+            {
+                path: "/cars/:id",
+                element: (
+                    <PrivateRoute>
+                        <CarDetails />
+                    </PrivateRoute>
+                ),
+            },
+            {
+                path: "/available-cars",
+                element: <AvailableCars />,
+            },
+            {
+                path: "/my-bookings",
+                element: (
+                    <PrivateRoute>
+                        <BookingPage />
+                    </PrivateRoute>
+                ),
+            },
+        ],
+    },
 ]);
 
 export default router;

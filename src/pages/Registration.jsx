@@ -26,7 +26,8 @@ const Registration = () => {
     return "";
   };
 
-  const handleRegister = (e) => {
+  // ---- FIREBASE TOKEN-BASED REGISTRATION ----
+  const handleRegister = async (e) => {
     e.preventDefault();
     const form = e.target;
     const name = form.name.value;
@@ -34,76 +35,57 @@ const Registration = () => {
     const email = form.email.value;
     const password = form.password.value;
 
-    // Validation and user creation logic here...
+    const passErr = validatePassword(password);
+    if (passErr) {
+      setPasswordError(passErr);
+      return;
+    }
+    setPasswordError("");
 
-    createUser(email, password)
-      .then((result) => {
-        const user = result.user;
-        // Call backend to save user data in MongoDB
-        const userProfile = {
-          name,
-          email,
-          photoURL: photo,
-          uid: user.uid,
-        };
-
-        fetch("http://localhost:3000/users", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(userProfile),
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            // Save user in the global state (AuthContext)
-            setUser({ ...user, displayName: name, photoURL: photo });
-            navigate(location.state ? location.state : "/");
-          })
-          .catch((error) => {
-            console.error("Error saving user to backend:", error);
-            alert("Failed to save user data.");
-            setUser(user);
-            navigate(location.state ? location.state : "/");
-          });
-      })
-      .catch((error) => {
-        alert(error.message);
+    try {
+      // 1. Register user with Firebase
+      const result = await createUser(email, password);
+      const user = result.user;
+      await updateUser({ displayName: name, photoURL: photo });
+      // 2. Get JWT token from Firebase
+      const idToken = await user.getIdToken();
+      // 3. Call backend to verify, set HTTP-only cookie, and create user record
+      const response = await fetch("http://localhost:3000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include", // crucial for http-only cookies
+        body: JSON.stringify({ idToken }),
       });
+      if (!response.ok) {
+        throw new Error("Failed to login/register (token not accepted)");
+      }
+      const data = await response.json();
+      setUser({ ...user, displayName: name, photoURL: photo });
+      navigate("/");
+    } catch (error) {
+      setError(error.message);
+    }
   };
 
-  const handleGoogleSignIn = () => {
-    googleSignIn()
-      .then((result) => {
-        const user = result.user;
-        const userProfile = {
-          name: user.displayName || "",
-          email: user.email || "",
-          photoURL: user.photoURL || "",
-          uid: user.uid,
-        };
-
-        // Send user data to the backend (MongoDB)
-        fetch("http://localhost:3000/users", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(userProfile),
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            alert(`${user.displayName} registered successfully`);
-            navigate(location.state ? location.state : "/");
-          })
-          .catch((error) => {
-            console.error("Error saving user to backend:", error);
-            alert("User registered but failed to save user data.");
-            navigate(location.state ? location.state : "/");
-          });
-      })
-      .catch((error) => {
-        alert(error.message || "Google sign-in failed");
-        setError("Something went wrong with Google login.");
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await googleSignIn();
+      const user = result.user;
+      // 1. Get Firebase JWT
+      const idToken = await user.getIdToken();
+      // 2. Send token to backend login endpoint (creates user/cookie)
+      const response = await fetch("http://localhost:3000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ idToken }),
       });
+      if (!response.ok) throw new Error("Google sign-in failed on backend");
+      setUser(user);
+      navigate("/");
+    } catch (error) {
+      setError(error.message || "Google sign-in failed");
+    }
   };
 
   return (

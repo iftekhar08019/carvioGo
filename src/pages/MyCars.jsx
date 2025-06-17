@@ -24,7 +24,9 @@ const MyCars = () => {
 
   useEffect(() => {
     if (user?.email) {
-      fetch(`http://localhost:3000/cars?email=${user.email}`)
+      fetch(`http://localhost:3000/cars?email=${user.email}`, {
+        credentials: "include",
+      })
         .then((res) => res.json())
         .then((data) => setCars(data))
         .catch((err) => console.error("Failed to fetch cars", err));
@@ -64,6 +66,7 @@ const MyCars = () => {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
+        credentials: "include", // Include credentials for cookie-based auth
       });
       if (!res.ok) throw new Error("Update failed");
 
@@ -105,6 +108,7 @@ const MyCars = () => {
     try {
       const res = await fetch(`http://localhost:3000/cars/${id}`, {
         method: "DELETE",
+        credentials: "include",
       });
       if (!res.ok) throw new Error("Delete failed");
 

@@ -49,6 +49,7 @@ const AddCarPage = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(carData),
+        credentials: "include", // important for http-only cookies
       });
 
       if (!res.ok) {

@@ -12,56 +12,53 @@ const Login = () => {
   const navigate = useNavigate();
 
   // Handle login
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setError("");
     const form = e.target;
     const email = form.email.value;
     const password = form.password.value;
 
-    signIn(email, password)
-      .then((result) => {
-        const user = result.user;
-        alert(user.displayName, "Logged in successfully");
-        navigate(`${location.state ? location.state : "/"}`);
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        setError(errorCode);
+    try {
+      const result = await signIn(email, password);
+      const user = result.user;
+      const idToken = await user.getIdToken(); // <-- Get Firebase JWT
+
+      // Send idToken to backend to create a secure session (cookie)
+      await fetch("http://localhost:3000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken }),
+        credentials: "include", // IMPORTANT! so browser accepts httpOnly cookie
       });
+      alert(user.displayName || user.email || "User", "Logged in successfully");
+      navigate(location.state ? location.state : "/");
+    } catch (error) {
+      const errorCode = error.code || error.message;
+      setError(errorCode);
+    }
   };
 
-  const handleGoogleSignIn = () => {
-    googleSignIn()
-      .then((result) => {
-        const user = result.user;
-        const userProfile = {
-          name: user.displayName || "",
-          email: user.email || "",
-          photoURL: user.photoURL || "",
-          uid: user.uid,
-        };
+  // Google Sign-In
+  const handleGoogleSignIn = async () => {
+    setError("");
+    try {
+      const result = await googleSignIn();
+      const user = result.user;
+      const idToken = await user.getIdToken(); // <-- Get Firebase JWT
 
-        // Send user data to the backend (MongoDB)
-        fetch("http://localhost:3000/users", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(userProfile),
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            alert(`${user.displayName} registered successfully`);
-            navigate(location.state ? location.state : "/");
-          })
-          .catch((error) => {
-            console.error("Error saving user to backend:", error);
-            alert("User registered but failed to save user data.");
-            navigate(location.state ? location.state : "/");
-          });
-      })
-      .catch((error) => {
-        alert(error.message || "Google sign-in failed");
-        setError("Something went wrong with Google login.");
+      // Send idToken to backend to create a secure session (cookie)
+      await fetch("http://localhost:3000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken }),
+        credentials: "include",
       });
+      alert(user.displayName || user.email || "User", "Logged in successfully");
+      navigate(location.state ? location.state : "/");
+    } catch (error) {
+      setError(error.message || "Google login failed");
+    }
   };
 
   return (
@@ -82,6 +79,7 @@ const Login = () => {
               Welcome Back
             </p>
             <div className="flex items-center border-2 mb-8 py-2 px-3 rounded-2xl border-blue-500 text-black bg-transparent">
+              {/* email input */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 text-gray-400"
@@ -108,6 +106,7 @@ const Login = () => {
               />
             </div>
             <div className="flex items-center border-2 mb-12 py-2 px-3 rounded-2xl border-blue-500 text-black">
+              {/* password input */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 text-gray-400"
@@ -128,11 +127,10 @@ const Login = () => {
                 required
               />
             </div>
-            {error && <p className="text-red-400 text-xs">{error}</p>}{" "}
-            {/* Error message */}
+            {error && <p className="text-red-400 text-xs">{error}</p>}
             <button
               onClick={handleGoogleSignIn}
-              type="submit"
+              type="button"
               className="block border-2 border-black w-full mt-5 py-2 rounded-2xl hover:bg-gray-300 hover:-translate-y-1 transition-all duration-500 text-black font-semibold mb-2"
             >
               <FaGoogle className="inline"></FaGoogle> Login with Google
@@ -165,12 +163,11 @@ const Login = () => {
             {/* Forgot Password link */}
             <div className="flex justify-between mt-4">
               <Link
-                to={"/forget-password"} // Trigger the forgot password function
+                to={"/forget-password"}
                 className="text-sm ml-2 text-black hover:text-blue-500 cursor-pointer hover:-translate-y-1 duration-500 transition-all"
               >
                 Forgot Password?
               </Link>
-
               <Link
                 to="/registration"
                 className="text-sm ml-2 text-black hover:text-blue-500 cursor-pointer hover:-translate-y-1 duration-500 transition-all"

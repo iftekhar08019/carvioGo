@@ -6,7 +6,9 @@ const RecentList = () => {
   const [cars, setCars] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/top-cars")
+    fetch("http://localhost:3000/top-cars", {
+      credentials: "include",
+    })
       .then((res) => res.json())
       .then((data) => {
         setCars(data);

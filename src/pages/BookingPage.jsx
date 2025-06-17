@@ -24,7 +24,9 @@ const MyBookings = () => {
 
   useEffect(() => {
     if (user?.email) {
-      fetch(`http://localhost:3000/bookings?email=${user.email}`)
+      fetch(`http://localhost:3000/bookings?email=${user.email}`, {
+        credentials: "include",
+      })
         .then((res) => res.json())
         .then(setBookings)
         .catch((err) => console.error("Failed to load bookings:", err));
@@ -48,6 +50,7 @@ const MyBookings = () => {
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
         }
       );
       const text = await response.text();
@@ -58,12 +61,14 @@ const MyBookings = () => {
         payload = { message: text };
       }
       if (!response.ok) {
-        return Swal.fire("Cancel failed", payload.error || payload.message, "error");
+        return Swal.fire(
+          "Cancel failed",
+          payload.error || payload.message,
+          "error"
+        );
       }
       setBookings((bs) =>
-        bs.map((b) =>
-          b._id === bookingId ? { ...b, status: "Canceled" } : b
-        )
+        bs.map((b) => (b._id === bookingId ? { ...b, status: "Canceled" } : b))
       );
       Swal.fire("Canceled", "Your booking was canceled.", "success");
     } catch (err) {
@@ -98,6 +103,7 @@ const MyBookings = () => {
             newStartDate: startDate.toISOString(),
             newEndDate: endDate.toISOString(),
           }),
+          credentials: "include",
         }
       );
       if (!res.ok) {
@@ -131,7 +137,7 @@ const MyBookings = () => {
           </Link>
         </div>
       ) : (
-        <>      
+        <>
           {/* Desktop Table */}
           <div className="hidden md:block overflow-x-auto">
             <table className="min-w-full table-auto">
@@ -139,8 +145,12 @@ const MyBookings = () => {
                 <tr>
                   <th className="px-4 py-2 font-semibold text-left">Image</th>
                   <th className="px-4 py-2 font-semibold text-left">Model</th>
-                  <th className="px-4 py-2 font-semibold text-left">Date Range</th>
-                  <th className="px-4 py-2 font-semibold text-left">Total Price</th>
+                  <th className="px-4 py-2 font-semibold text-left">
+                    Date Range
+                  </th>
+                  <th className="px-4 py-2 font-semibold text-left">
+                    Total Price
+                  </th>
                   <th className="px-4 py-2 font-semibold text-left">Status</th>
                   <th className="px-4 py-2 font-semibold text-left">Actions</th>
                 </tr>
@@ -154,22 +164,35 @@ const MyBookings = () => {
                   return (
                     <tr
                       key={b._id}
-                      className={`${i % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:shadow-md`}
+                      className={`${
+                        i % 2 === 0 ? "bg-white" : "bg-gray-50"
+                      } hover:shadow-md`}
                     >
                       <td className="px-4 py-3">
-                        <img src={b.carImage} alt={b.carModel} className="w-16 h-16 object-cover rounded" />
+                        <img
+                          src={b.carImage}
+                          alt={b.carModel}
+                          className="w-16 h-16 object-cover rounded"
+                        />
                       </td>
                       <td className="px-4 py-3">{b.carModel}</td>
                       <td className="px-4 py-3 space-x-1">
                         <FaCalendarAlt className="inline text-gray-600" />
-                        {fmt(b.startDate || b.bookingDate)} – {fmt(b.endDate || b.bookingDate)}
+                        {fmt(b.startDate || b.bookingDate)} –{" "}
+                        {fmt(b.endDate || b.bookingDate)}
                       </td>
                       <td className="px-4 py-3">
                         <FaDollarSign className="inline mr-1" />
                         {b.totalPrice}
                       </td>
                       <td className="px-4 py-3">
-                        <span className={b.status === "Canceled" ? "text-red-600" : "text-green-600"}>
+                        <span
+                          className={
+                            b.status === "Canceled"
+                              ? "text-red-600"
+                              : "text-green-600"
+                          }
+                        >
                           {b.status}
                         </span>
                       </td>
@@ -201,18 +224,35 @@ const MyBookings = () => {
               const disabled = b.status === "Canceled";
               const btnClass = disabled ? "opacity-50 cursor-not-allowed" : "";
               return (
-                <div key={b._id} className="border rounded-lg p-4 shadow hover:shadow-md transition">
+                <div
+                  key={b._id}
+                  className="border rounded-lg p-4 shadow hover:shadow-md transition"
+                >
                   <div className="flex items-center mb-3">
-                    <img src={b.carImage} alt={b.carModel} className="w-20 h-20 object-cover rounded mr-4" />
+                    <img
+                      src={b.carImage}
+                      alt={b.carModel}
+                      className="w-20 h-20 object-cover rounded mr-4"
+                    />
                     <div>
                       <h2 className="font-semibold text-lg">{b.carModel}</h2>
                       <p className="text-gray-600">
-                        <FaCalendarAlt className="inline mr-1" /> {fmt(b.startDate || b.bookingDate)} – {fmt(b.endDate || b.bookingDate)}
+                        <FaCalendarAlt className="inline mr-1" />{" "}
+                        {fmt(b.startDate || b.bookingDate)} –{" "}
+                        {fmt(b.endDate || b.bookingDate)}
                       </p>
                       <p className="text-gray-600">
                         <FaDollarSign className="inline mr-1" />${b.totalPrice}
                       </p>
-                      <p className={b.status === "Canceled" ? "text-red-600" : "text-green-600"}>{b.status}</p>
+                      <p
+                        className={
+                          b.status === "Canceled"
+                            ? "text-red-600"
+                            : "text-green-600"
+                        }
+                      >
+                        {b.status}
+                      </p>
                     </div>
                   </div>
                   <div className="flex justify-end space-x-2">
@@ -250,8 +290,18 @@ const MyBookings = () => {
                   inline
                 />
                 <div className="mt-4 flex justify-end space-x-2">
-                  <button onClick={() => setModalOpen(false)} className="btn btn-outline">Cancel</button>
-                  <button onClick={handleModifyConfirm} className="btn btn-primary">Confirm</button>
+                  <button
+                    onClick={() => setModalOpen(false)}
+                    className="btn btn-outline"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleModifyConfirm}
+                    className="btn btn-primary"
+                  >
+                    Confirm
+                  </button>
                 </div>
               </div>
             </div>
