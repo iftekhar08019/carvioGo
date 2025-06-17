@@ -1,85 +1,89 @@
-CarVioGo - Car Rental System
-CarVioGo is a modern, full-featured car rental platform designed to provide a seamless and user-friendly experience for both car owners and renters. This project allows users to list their cars for rent, manage their listings, and book available vehicles with ease.
+# CarVioGo - Car Rental System
 
-Live URL: https://carviogo.web.app/
+**CarVioGo** is a modern, full-featured car rental platform designed to provide a seamless and user-friendly experience for both car owners and renters. This project allows users to list their cars for rent, manage their listings, and book available vehicles with ease.
 
-Key Features
-User Authentication: Secure user registration and login system using Firebase Authentication, including email/password and Google social login.
+🔗 **Live URL:** [https://carviogo.web.app/](https://carviogo.web.app/)
 
-Private Routes: Protected routes to ensure that only authenticated users can access sensitive pages like "Add Car," "My Cars," and "My Bookings."
+---
 
-Car Management (for owners):
+## 🔑 Key Features
 
-Add Cars: Authenticated users can add new cars to the platform with detailed information.
+### 🔐 User Authentication
+- Secure user registration and login using **Firebase Authentication**
+- Supports **Email/Password** and **Google social login**
 
-Update Cars: Users can edit the details of their listed cars through a user-friendly modal.
+### 🔒 Private Routes
+- Protected pages like `Add Car`, `My Cars`, and `My Bookings` accessible only to authenticated users
 
-Delete Cars: Users can remove their car listings after a confirmation prompt.
+### 🚘 Car Management (for Owners)
+- **Add Cars**: Add new car listings with detailed information
+- **Update Cars**: Edit car details via a user-friendly modal
+- **Delete Cars**: Remove listings after a confirmation prompt
+- **My Cars Page**: View and manage all listed cars in a table format
 
-My Cars Page: A dedicated page for users to view and manage all the cars they have listed, presented in a clear tabular format.
+### 🚗 Car Booking (for Renters)
+- **Available Cars Page**: Browse all available cars in grid or list view
+- **Sorting & Filtering**: 
+  - Sort by price (Low → High / High → Low)
+  - Filter by model, brand, or location
+- **Car Details**: View full information before booking
+- **Booking System**: Simple booking with confirmation modal
+- **My Bookings Page**: View booking history with options to change date or cancel
 
-Car Booking (for renters):
+### 📱 Responsive Design
+- Fully responsive interface optimized for **desktops**, **tablets**, and **mobile devices**
 
-Available Cars Page: Browse all available cars in both grid and list views.
+### ✨ Interactive UI
+- Hover effects, modals for actions, and toast/modal notifications for feedback
 
-Sorting & Filtering: Sort cars by price (low to high / high to low) and date added. Search for cars by model, brand, or location.
+### 🚫 Custom 404 Page
+- User-friendly page for handling invalid URLs
 
-Car Details: View comprehensive details for each car before booking.
+---
 
-Booking System: A straightforward booking process with a confirmation modal.
+## 🧰 Technologies & npm Packages Used
 
-My Bookings Page: A private page for users to view their booking history, with options to modify the booking date or cancel a booking.
+- **Framework**: React.js  
+- **Routing**: React Router DOM  
+- **Styling**: Tailwind CSS, DaisyUI  
+- **Authentication**: Firebase  
+- **HTTP Client**: Axios  
+- **Notifications**: React Hot Toast, SweetAlert2  
+- **Icons**: React Icons  
 
-Responsive Design: A fully responsive and mobile-friendly interface, ensuring a great user experience on desktops, tablets, and mobile devices.
+---
 
-Interactive UI: Features like hover effects, modals for actions, and toast/modal notifications for user feedback.
+## 🛠 Getting Started Locally
 
-Custom 404 Page: A user-friendly error page to handle invalid URLs.
+### 1️⃣ Clone the repository:
+```bash
 
-Technologies & npm Packages Used
-This project was built using the following technologies and packages:
-
-Framework: React.js
-
-Routing: React Router DOM
-
-Styling: Tailwind CSS, DaisyUI
-
-Authentication: Firebase
-
-HTTP Client: Axios (for communicating with the backend API)
-
-Notifications: React Hot Toast / SweetAlert2
-
-Icons: React Icons
-
-Getting Started Locally
-To run this project on your local machine, follow these steps:
-
-Clone the repository:
-
-git clone <your-repository-url>
-
-Navigate to the project directory:
-
+### 2️⃣ Navigate to the project directory:
+```bash
 cd carviogo-client
+```
 
-Install the dependencies:
-
+### 3️⃣ Install dependencies:
+```bash
 npm install
+```
 
-Set up environment variables:
-Create a .env.local file in the root of the project and add your Firebase configuration keys:
+### 4️⃣ Set up environment variables:
 
-VITE_APIKEY=your_firebase_apikey
-VITE_AUTHDOMAIN=your_firebase_authdomain
-VITE_PROJECTID=your_firebase_projectid
-VITE_STORAGEBUCKET=your_firebase_storagebucket
-VITE_MESSAGINGSENDERID=your_firebase_messagingsenderid
+Create a `.env.local` file in the root directory and add your Firebase configuration keys:
+
+```env
+VITE_APIKEY=your_firebase_apikey  
+VITE_AUTHDOMAIN=your_firebase_authdomain  
+VITE_PROJECTID=your_firebase_projectid  
+VITE_STORAGEBUCKET=your_firebase_storagebucket  
+VITE_MESSAGINGSENDERID=your_firebase_messagingsenderid  
 VITE_APPID=your_firebase_appid
+```
 
-Run the development server:
-
+### 5️⃣ Run the development server:
+```bash
 npm run dev
+```
 
-The application will be available at http://localhost:5173.
+Visit the app at: [http://localhost:5173](http://localhost:5173)
