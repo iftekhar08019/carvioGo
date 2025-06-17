@@ -10,6 +10,7 @@ import AddCarPage from "../pages/AddCar";
 import MyCars from "../pages/MyCars";
 import CarDetails from "../pages/CarDetails";
 import AvailableCars from "../pages/AvailableCars";
+import BookingPage from "../pages/BookingPage";
 
 const router = createBrowserRouter([
   {
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
                {
         path: "/available-cars",
         element: <AvailableCars />,
+      },
+                   {
+        path: "/my-bookings",
+        element: <BookingPage />,
       },
     ],
   },

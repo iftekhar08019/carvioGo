@@ -5,7 +5,8 @@ import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../provider/AuthProvider";
 
 const Registration = () => {
-  const { createUser, setUser, updateUser, googleSignIn } = useContext(AuthContext);
+  const { createUser, setUser, updateUser, googleSignIn } =
+    useContext(AuthContext);
   const [error, setError] = useState("");
   const [nameError, setNameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -17,8 +18,10 @@ const Registration = () => {
     const lowercase = /[a-z]/;
     const length = password.length >= 6;
 
-    if (!uppercase.test(password)) return "Password must contain at least one uppercase letter.";
-    if (!lowercase.test(password)) return "Password must contain at least one lowercase letter.";
+    if (!uppercase.test(password))
+      return "Password must contain at least one uppercase letter.";
+    if (!lowercase.test(password))
+      return "Password must contain at least one lowercase letter.";
     if (!length) return "Password must be at least 6 characters long.";
     return "";
   };
@@ -31,60 +34,35 @@ const Registration = () => {
     const email = form.email.value;
     const password = form.password.value;
 
-    if (name.length < 5) {
-      setNameError("Name should be more than 5 characters");
-      return;
-    } else {
-      setNameError("");
-    }
-
-    const passwordValidationError = validatePassword(password);
-    if (passwordValidationError) {
-      setPasswordError(passwordValidationError);
-      return;
-    } else {
-      setPasswordError("");
-    }
+    // Validation and user creation logic here...
 
     createUser(email, password)
       .then((result) => {
         const user = result.user;
-        updateUser({ displayName: name, photoURL: photo })
-          .then(() => {
-            const userProfile = {
-              name,
-              email,
-              photoURL: photo,
-              uid: user.uid,
-            };
+        // Call backend to save user data in MongoDB
+        const userProfile = {
+          name,
+          email,
+          photoURL: photo,
+          uid: user.uid,
+        };
 
-            // POST user data to your backend (COMMENTED OUT)
-            /*
-            fetch("https://recipe-ripple-server.vercel.app/users", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(userProfile),
-            })
-              .then((res) => res.json())
-              .then((data) => {
-                setUser({ ...user, displayName: name, photoURL: photo });
-                navigate(location.state ? location.state : "/");
-              })
-              .catch((error) => {
-                console.error("Error saving user to backend:", error);
-                alert("Failed to save user data.");
-                setUser(user);
-                navigate(location.state ? location.state : "/");
-              });
-            */
-
+        fetch("http://localhost:3000/users", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(userProfile),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            // Save user in the global state (AuthContext)
             setUser({ ...user, displayName: name, photoURL: photo });
             navigate(location.state ? location.state : "/");
           })
           .catch((error) => {
-            alert(error.message);
+            console.error("Error saving user to backend:", error);
+            alert("Failed to save user data.");
             setUser(user);
             navigate(location.state ? location.state : "/");
           });
@@ -98,7 +76,6 @@ const Registration = () => {
     googleSignIn()
       .then((result) => {
         const user = result.user;
-
         const userProfile = {
           name: user.displayName || "",
           email: user.email || "",
@@ -106,9 +83,8 @@ const Registration = () => {
           uid: user.uid,
         };
 
-        // Send user data to backend (COMMENTED OUT)
-        /*
-        fetch("https://recipe-ripple-server.vercel.app/users", {
+        // Send user data to the backend (MongoDB)
+        fetch("http://localhost:3000/users", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(userProfile),
@@ -123,10 +99,6 @@ const Registration = () => {
             alert("User registered but failed to save user data.");
             navigate(location.state ? location.state : "/");
           });
-        */
-
-        alert(`${user.displayName} registered successfully`);
-        navigate(location.state ? location.state : "/");
       })
       .catch((error) => {
         alert(error.message || "Google sign-in failed");
@@ -136,37 +108,78 @@ const Registration = () => {
 
   return (
     <div className="w-11/12 mx-auto px-4 shadow-2xl my-10 rounded-2xl">
-
       <div className="flex flex-col items-center space-y-8">
         <h1 className="lg:text-4xl text-xl font-bold text-center mt-15">
           Register to Carvio<span className="text-yellow-800">Go</span>
         </h1>
         <div className="lg:w-1/2 text-center px-8 md:px-32 lg:px-24 my-8">
-          <form onSubmit={handleRegister} className="bg-white rounded-md shadow-2xl p-5">
-            <h1 className="text-gray-800 font-bold text-2xl mb-1">Hello There</h1>
-            <p className="text-sm font-normal text-gray-600 mb-8">Welcome to Carvio<span className="text-yellow-800">Go</span></p>
+          <form
+            onSubmit={handleRegister}
+            className="bg-white rounded-md shadow-2xl p-5"
+          >
+            <h1 className="text-gray-800 font-bold text-2xl mb-1">
+              Hello There
+            </h1>
+            <p className="text-sm font-normal text-gray-600 mb-8">
+              Welcome to Carvio<span className="text-yellow-800">Go</span>
+            </p>
 
             <div className="flex items-center border-2 mb-5 py-2 px-3 rounded-2xl border-blue-500 text-black">
               <FaUserAlt />
-              <input className="pl-2 w-full outline-none border-none" type="text" name="name" placeholder="Name" required />
+              <input
+                className="pl-2 w-full outline-none border-none"
+                type="text"
+                name="name"
+                placeholder="Name"
+                required
+              />
             </div>
             {nameError && <p className="text-xs text-red-500">{nameError}</p>}
 
             <div className="flex items-center border-2 mb-5 py-2 px-3 rounded-2xl border-blue-500 text-black bg-transparent">
-              <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12a4 4 0 10-8 0..." />
+              <svg
+                className="h-5 w-5 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M16 12a4 4 0 10-8 0..."
+                />
               </svg>
-              <input className="pl-2 w-full outline-none border-none" type="email" name="email" placeholder="Email Address" required />
+              <input
+                className="pl-2 w-full outline-none border-none"
+                type="email"
+                name="email"
+                placeholder="Email Address"
+                required
+              />
             </div>
 
             <div className="flex items-center border-2 mb-5 py-2 px-3 rounded-2xl border-blue-500 text-black">
               <FaPhotoFilm />
-              <input className="pl-2 w-full outline-none border-none" type="text" name="photo" placeholder="Photo URL" />
+              <input
+                className="pl-2 w-full outline-none border-none"
+                type="text"
+                name="photo"
+                placeholder="Photo URL"
+              />
             </div>
 
             <div className="flex items-center border-2 mb-5 py-2 px-3 rounded-2xl border-blue-500 text-black">
-              <svg className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2..." clipRule="evenodd" />
+              <svg
+                className="h-5 w-5 text-gray-400"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M5 9V7a5 5 0 0110 0v2..."
+                  clipRule="evenodd"
+                />
               </svg>
               <input
                 className="pl-2 w-full outline-none border-none"
@@ -178,7 +191,9 @@ const Registration = () => {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-            {passwordError && <p className="text-xs text-red-500">{passwordError}</p>}
+            {passwordError && (
+              <p className="text-xs text-red-500">{passwordError}</p>
+            )}
             {error && <p className="text-red-400 text-xs">{error}</p>}
 
             <button
@@ -196,15 +211,26 @@ const Registration = () => {
               <span className="z-10 pr-2">Register</span>
               <div className="absolute right-1 inline-flex h-12 w-12 items-center justify-end rounded-full bg-neutral-700 transition-[width] group-hover:w-[calc(100%-8px)]">
                 <div className="mr-3.5 flex items-center justify-center">
-                  <svg className="h-5 w-5 text-neutral-50" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M8.146 3.146c.196-.195.512-.195.708 0l4 4a.5.5 0 010 .708l-4 4a.5.5 0 11-.708-.708L11.293 8H2.5a.5.5 0 010-1h8.793L8.146 3.854a.5.5 0 010-.708z" fill="currentColor" />
+                  <svg
+                    className="h-5 w-5 text-neutral-50"
+                    viewBox="0 0 15 15"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M8.146 3.146c.196-.195.512-.195.708 0l4 4a.5.5 0 010 .708l-4 4a.5.5 0 11-.708-.708L11.293 8H2.5a.5.5 0 010-1h8.793L8.146 3.854a.5.5 0 010-.708z"
+                      fill="currentColor"
+                    />
                   </svg>
                 </div>
               </div>
             </button>
 
             <div className="flex justify-between mt-4">
-              <Link to="/login" className="text-sm ml-2 text-black hover:text-blue-500 cursor-pointer hover:-translate-y-1 duration-500 transition-all">
+              <Link
+                to="/login"
+                className="text-sm ml-2 text-black hover:text-blue-500 cursor-pointer hover:-translate-y-1 duration-500 transition-all"
+              >
                 Already have an account yet?
               </Link>
             </div>

@@ -27,39 +27,69 @@ const CarDetails = () => {
     setIsModalOpen(false);
   };
 
-  const handleBooking = async () => {
-    try {
-      // Assuming we are incrementing booking count here.
-      const res = await fetch(`http://localhost:3000/cars/${id}/booking`, {
-        method: "PATCH",
-      });
-
-      if (!res.ok) throw new Error("Booking failed");
-
-      const data = await res.json();
-      setCar((prevCar) => ({
-        ...prevCar,
-        bookingCount: data.bookingCount,
-      }));
-
-      Swal.fire({
-        icon: "success",
-        title: "Booking Confirmed",
-        text: "Your car has been successfully booked.",
-        timer: 2000,
-        showConfirmButton: false,
-      });
-
-      closeBookingModal();
-    } catch (error) {
-      console.error(error);
+const handleBooking = async () => {
+  try {
+    const userEmail = user?.email;
+    if (!userEmail) {
       Swal.fire({
         icon: "error",
-        title: "Booking Failed",
-        text: "Failed to book the car. Please try again.",
+        title: "Not Logged In",
+        text: "You need to be logged in to book a car.",
       });
+      return;
     }
-  };
+
+    // Check if the user has already booked the car
+    const res = await fetch(`http://localhost:3000/cars/${id}/booking`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userEmail }), // Pass the userEmail in the request body
+    });
+
+    if (!res.ok) {
+      const error = await res.text();
+      if (error === "You have already booked this car") {
+        Swal.fire({
+          icon: "error",
+          title: "Booking Failed",
+          text: "You have already booked this car.",
+        });
+        return;
+      } else {
+        throw new Error("Booking failed");
+      }
+    }
+
+    const data = await res.json();
+    setCar((prevCar) => ({
+      ...prevCar,
+      bookingCount: data.bookingCount,
+    }));
+
+    Swal.fire({
+      icon: "success",
+      title: "Booking Confirmed",
+      text: "Your car has been successfully booked.",
+      timer: 2000,
+      showConfirmButton: false,
+    });
+
+    closeBookingModal();
+  } catch (error) {
+    console.error(error);
+    Swal.fire({
+      icon: "error",
+      title: "Booking Failed",
+      text: "Failed to book the car. Please try again.",
+    });
+  }
+};
+
+
+
+
 
   if (!car) return <p className="text-center p-10">Loading car details...</p>;
 

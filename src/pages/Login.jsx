@@ -4,7 +4,6 @@ import { Link, useNavigate } from "react-router";
 import { useLocation } from "react-router";
 import { AuthContext } from "../provider/AuthProvider";
 
-
 const Login = () => {
   const [error, setError] = useState("");
   const [email, setEmail] = useState("");
@@ -32,14 +31,35 @@ const Login = () => {
   };
 
   const handleGoogleSignIn = () => {
-    googleSignIn() // Call googleSignIn method from AuthContext
+    googleSignIn()
       .then((result) => {
         const user = result.user;
-        alert(user.displayName, " Logged in successfully");
-        navigate(`${location.state ? location.state : "/"}`); // Redirect after successful login
+        const userProfile = {
+          name: user.displayName || "",
+          email: user.email || "",
+          photoURL: user.photoURL || "",
+          uid: user.uid,
+        };
+
+        // Send user data to the backend (MongoDB)
+        fetch("http://localhost:3000/users", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(userProfile),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            alert(`${user.displayName} registered successfully`);
+            navigate(location.state ? location.state : "/");
+          })
+          .catch((error) => {
+            console.error("Error saving user to backend:", error);
+            alert("User registered but failed to save user data.");
+            navigate(location.state ? location.state : "/");
+          });
       })
       .catch((error) => {
-        alert(error);
+        alert(error.message || "Google sign-in failed");
         setError("Something went wrong with Google login.");
       });
   };
@@ -47,7 +67,7 @@ const Login = () => {
   return (
     <div className="w-11/12 mx-auto px-4 shadow-2xl my-10 rounded-2xl">
       <div className="flex flex-col items-center space-y-8">
-                <h1 className="lg:text-4xl text-xl font-bold text-center mt-15">
+        <h1 className="lg:text-4xl text-xl font-bold text-center mt-15">
           Login to Carvio<span className="text-yellow-800">Go</span>
         </h1>
         <div className="lg:w-1/2 text-center px-8 md:px-32 lg:px-24 my-8">
