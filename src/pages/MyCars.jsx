@@ -20,6 +20,7 @@ const MyCars = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCar, setEditingCar] = useState(null);
   const [formData, setFormData] = useState(initialCarState);
+  const [sortBy, setSortBy] = useState("date-desc"); // default: newest first
 
   useEffect(() => {
     if (user?.email) {
@@ -59,14 +60,11 @@ const MyCars = () => {
     e.preventDefault();
 
     try {
-      const res = await fetch(
-        `http://localhost:3000/cars/${editingCar._id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        }
-      );
+      const res = await fetch(`http://localhost:3000/cars/${editingCar._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
       if (!res.ok) throw new Error("Update failed");
 
       setCars((prev) =>
@@ -131,20 +129,54 @@ const MyCars = () => {
 
   if (!user) return <p className="text-center p-10">Loading user info...</p>;
 
+  const sortedCars = [...cars].sort((a, b) => {
+    if (sortBy === "date-desc") {
+      return new Date(b.dateAdded) - new Date(a.dateAdded);
+    }
+    if (sortBy === "date-asc") {
+      return new Date(a.dateAdded) - new Date(b.dateAdded);
+    }
+    if (sortBy === "price-asc") {
+      return Number(a.dailyRentalPrice) - Number(b.dailyRentalPrice);
+    }
+    if (sortBy === "price-desc") {
+      return Number(b.dailyRentalPrice) - Number(a.dailyRentalPrice);
+    }
+    return 0;
+  });
+
   return (
     <div className="min-h-screen bg-transparent py-10 px-4 max-w-7xl mx-auto">
       <h1 className="text-4xl font-bold mb-8 text-center">My Cars</h1>
 
       {cars.length === 0 && (
         <p className="text-center text-gray-600">
-          You have not added any cars yet. <a href="/add-car" className="text-blue-600">Add a car</a>
+          You have not added any cars yet.{" "}
+          <a href="/add-car" className="text-blue-600">
+            Add a car
+          </a>
         </p>
       )}
+      <div className="flex flex-wrap gap-3 mb-4 items-center justify-between">
+        <div>
+          <label className="font-semibold mr-2">Sort by:</label>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="select select-bordered select-sm"
+          >
+            <option value="date-desc">Date Added (Newest First)</option>
+            <option value="date-asc">Date Added (Oldest First)</option>
+            <option value="price-asc">Price (Lowest First)</option>
+            <option value="price-desc">Price (Highest First)</option>
+          </select>
+        </div>
+      </div>
 
       <div className="overflow-x-auto">
         <table className="table w-full">
           <thead>
-            <tr>
+            <tr className="hidden lg:table-row">
               <th>Car Image</th>
               <th>Car Model</th>
               <th>Daily Rental Price</th>
@@ -154,14 +186,15 @@ const MyCars = () => {
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody>
-            {cars.map((car) => (
+          {/* Desktop Table View */}
+          <tbody className="hidden md:table-row-group">
+            {sortedCars.map((car) => (
               <tr key={car._id}>
                 <td>
                   <img
                     src={car.image}
                     alt={car.model}
-                    className="w-16 h-16 object-cover"
+                    className="w-16 h-16 object-cover rounded"
                   />
                 </td>
                 <td>{car.carModel}</td>
@@ -186,6 +219,62 @@ const MyCars = () => {
               </tr>
             ))}
           </tbody>
+
+          {/* Mobile Card View */}
+          <div className="md:hidden flex flex-col gap-4">
+            {sortedCars.map((car) => (
+              <div
+                key={car._id}
+                className="bg-white rounded-xl  shadow p-4 flex flex-col gap-3"
+              >
+                <div className="flex gap-4 items-center">
+                  <img
+                    src={car.image}
+                    alt={car.model}
+                    className="w-20 h-20 object-cover rounded"
+                  />
+                  <div>
+                    <div className="font-bold text-lg">{car.carModel}</div>
+                    <div className="text-sm text-gray-500">
+                      {car.availability}
+                    </div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <span className="font-semibold">Price:</span> $
+                    {car.dailyRentalPrice}/day
+                  </div>
+                  <div>
+                    <span className="font-semibold">Bookings:</span>{" "}
+                    {car.bookingCount}
+                  </div>
+                  <div>
+                    <span className="font-semibold">Added:</span>{" "}
+                    {new Date(car.dateAdded).toLocaleDateString()}
+                  </div>
+                  <div>
+                    <span className="font-semibold">Reg No:</span>{" "}
+                    {car.vehicleRegistrationNumber}
+                  </div>
+                </div>
+                <div className="flex gap-2 mt-2">
+                  <button
+                    onClick={() => openEditModal(car)}
+                    className="btn btn-sm btn-outline btn-primary flex items-center gap-2"
+                  >
+                    <FaEdit /> Update
+                  </button>
+                  <button
+                    onClick={() => handleDelete(car._id)}
+                    className="btn btn-sm btn-outline btn-error flex items-center gap-2"
+                  >
+                    <FaTrash /> Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </table>
       </div>
 
@@ -281,19 +370,24 @@ const MyCars = () => {
                 <div className="mt-2">
                   <label className="block font-semibold mb-2">Features:</label>
                   <div className="flex flex-wrap gap-4">
-                    {["GPS", "AC", "Bluetooth", "Leather Seats"].map((feature) => (
-                      <label key={feature} className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          name="features"
-                          value={feature}
-                          checked={formData.features.includes(feature)}
-                          onChange={handleFormChange}
-                          className="checkbox checkbox-sm"
-                        />
-                        {feature}
-                      </label>
-                    ))}
+                    {["GPS", "AC", "Bluetooth", "Leather Seats"].map(
+                      (feature) => (
+                        <label
+                          key={feature}
+                          className="flex items-center gap-2"
+                        >
+                          <input
+                            type="checkbox"
+                            name="features"
+                            value={feature}
+                            checked={formData.features.includes(feature)}
+                            onChange={handleFormChange}
+                            className="checkbox checkbox-sm"
+                          />
+                          {feature}
+                        </label>
+                      )
+                    )}
                   </div>
                 </div>
 
