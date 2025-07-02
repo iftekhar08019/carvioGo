@@ -67,7 +67,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="bg-blue-500">
+    <div className="bg-blue-500 sticky top-0 z-50 shadow-lg">
       <nav className="relative px-4 py-4 flex items-center bg-white justify-between">
         {/* Logo */}
         <Link to={"/"} className="text-3xl font-bold leading-none flex items-center gap-2">
