@@ -33,7 +33,14 @@ const MyBookings = () => {
           return res.json();
         })
         .then(setBookings)
-        .catch((err) => console.error("Failed to load bookings:", err));
+        .catch(async (err) => {
+          console.error("Failed to load bookings:", err);
+          await Swal.fire({
+            icon: "error",
+            title: "Failed to Load Bookings",
+            text: "Unable to load your bookings. Please try again later.",
+          });
+        });
     }
   }, [user?.email]);
 
@@ -77,7 +84,7 @@ const MyBookings = () => {
       Swal.fire("Canceled", "Your booking was canceled.", "success");
     } catch (err) {
       console.error("NETWORK ERROR in cancel:", err);
-      Swal.fire("Cancel failed", err.message, "error");
+      await Swal.fire("Cancel failed", err.message, "error");
     }
   };
 
@@ -122,7 +129,7 @@ const MyBookings = () => {
       Swal.fire("Updated", "Booking dates updated.", "success");
     } catch (err) {
       console.error("Modify error:", err);
-      Swal.fire("Update failed", err.message, "error");
+      await Swal.fire("Update failed", err.message, "error");
     }
   };
 

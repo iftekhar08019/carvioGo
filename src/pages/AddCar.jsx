@@ -77,7 +77,7 @@ const AddCarPage = () => {
       });
     } catch (error) {
       console.error(error);
-      Swal.fire({
+      await Swal.fire({
         title: "Error",
         text: error.message || "Failed to add car",
         icon: "error",

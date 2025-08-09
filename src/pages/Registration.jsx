@@ -3,6 +3,7 @@ import { FaUserAlt } from "react-icons/fa";
 import { FaGoogle, FaPhotoFilm } from "react-icons/fa6";
 import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../provider/AuthProvider";
+import Swal from "sweetalert2";
 
 const Registration = () => {
   const { createUser, setUser, updateUser, googleSignIn } =
@@ -37,6 +38,11 @@ const Registration = () => {
     const passErr = validatePassword(password);
     if (passErr) {
       setPasswordError(passErr);
+      await Swal.fire({
+        icon: "error",
+        title: "Password Validation Error",
+        text: passErr,
+      });
       return;
     }
     setPasswordError("");
@@ -60,9 +66,23 @@ const Registration = () => {
       }
       await response.json(); // Consume the response
       setUser({ ...user, displayName: name, photoURL: photo });
+      
+      await Swal.fire({
+        icon: "success",
+        title: "Registration Successful!",
+        text: `Welcome to CarvioGo, ${name}!`,
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      
       navigate("/");
     } catch (error) {
       setError(error.message);
+      await Swal.fire({
+        icon: "error",
+        title: "Registration Failed",
+        text: error.message || "An error occurred during registration",
+      });
     }
   };
 
@@ -81,9 +101,23 @@ const Registration = () => {
       });
       if (!response.ok) throw new Error("Google sign-in failed on backend");
       setUser(user);
+      
+      await Swal.fire({
+        icon: "success",
+        title: "Google Sign-in Successful!",
+        text: `Welcome to CarvioGo, ${user.displayName || user.email}!`,
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      
       navigate("/");
     } catch (error) {
       setError(error.message || "Google sign-in failed");
+      await Swal.fire({
+        icon: "error",
+        title: "Google Sign-in Failed",
+        text: error.message || "An error occurred during Google sign-in",
+      });
     }
   };
 

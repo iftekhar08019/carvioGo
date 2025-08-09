@@ -29,7 +29,14 @@ const MyCars = () => {
       })
         .then((res) => res.json())
         .then((data) => setCars(data))
-        .catch((err) => console.error("Failed to fetch cars", err));
+        .catch(async (err) => {
+          console.error("Failed to fetch cars", err);
+          await Swal.fire({
+            icon: "error",
+            title: "Failed to Load Cars",
+            text: "Unable to load your cars. Please try again later.",
+          });
+        });
     }
   }, [user?.email]);
 
@@ -87,7 +94,7 @@ const MyCars = () => {
       });
     } catch (error) {
       console.error(error);
-      Swal.fire({
+      await Swal.fire({
         icon: "error",
         title: "Update Failed",
         text: "Failed to update car details. Please try again.",
@@ -129,7 +136,7 @@ const MyCars = () => {
       });
     } catch (error) {
       console.error(error);
-      Swal.fire({
+      await Swal.fire({
         icon: "error",
         title: "Delete Failed",
         text: "Failed to delete car. Please try again.",

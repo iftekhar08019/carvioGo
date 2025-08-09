@@ -5,7 +5,7 @@ import carAnimation from "../assets/car.json";
 
 const ErrorPage = () => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white px-4 text-center">
+    <div className="flex flex-col items-center justify-center flex-1 bg-white px-4 text-center">
       {/* Lottie Animation */}
       <div className="w-full max-w-md">
         <Lottie animationData={carAnimation} loop={true} />
@@ -14,7 +14,7 @@ const ErrorPage = () => {
       {/* Error Message */}
       <h1 className="text-4xl font-bold text-gray-800 mt-6">404 - Page Not Found</h1>
       <p className="text-gray-500 mt-2">
-        Oops! The page you are looking for doesn’t exist.
+        Oops! The page you are looking for doesn't exist.
       </p>
 
       {/* Back to Home */}

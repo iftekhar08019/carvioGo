@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import CarCard from "./CarCard";
 import { Link } from "react-router";
+import Swal from "sweetalert2";
 
 const RecentList = () => {
   const [cars, setCars] = useState([]);
@@ -13,7 +14,14 @@ const RecentList = () => {
       .then((data) => {
         setCars(data);
       })
-      .catch((err) => console.error("Failed to load cars:", err));
+      .catch(async (err) => {
+        console.error("Failed to load cars:", err);
+        await Swal.fire({
+          icon: "error",
+          title: "Failed to Load Recent Cars",
+          text: "Unable to load recent cars. Please try again later.",
+        });
+      });
   }, []);
 
   return (

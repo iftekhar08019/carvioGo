@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { FaTh, FaListUl } from "react-icons/fa";
 import Loading from "../components/Loading";
+import Swal from "sweetalert2";
 
 const AvailableCars = () => {
   const [cars, setCars] = useState([]);
@@ -18,7 +19,14 @@ const AvailableCars = () => {
     })
       .then((res) => res.json())
       .then((data) => setCars(data))
-      .catch((err) => console.error("Failed to load cars:", err))
+      .catch(async (err) => {
+        console.error("Failed to load cars:", err);
+        await Swal.fire({
+          icon: "error",
+          title: "Failed to Load Cars",
+          text: "Unable to load available cars. Please try again later.",
+        });
+      })
       .finally(() => setLoading(false));
   }, []);
 

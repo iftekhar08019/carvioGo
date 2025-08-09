@@ -3,6 +3,7 @@ import { FaGoogle } from "react-icons/fa";
 import { Link, useNavigate } from "react-router";
 import { useLocation } from "react-router";
 import { AuthContext } from "../provider/AuthProvider";
+import Swal from "sweetalert2";
 
 const Login = () => {
   const [error, setError] = useState("");
@@ -31,11 +32,25 @@ const Login = () => {
         body: JSON.stringify({ idToken }),
         credentials: "include", // IMPORTANT! so browser accepts httpOnly cookie
       });
-      alert(user.displayName || user.email || "User", "Logged in successfully");
+      
+      await Swal.fire({
+        icon: "success",
+        title: "Login Successful!",
+        text: `Welcome back, ${user.displayName || user.email || "User"}!`,
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      
       navigate(location.state ? location.state : "/");
     } catch (error) {
       const errorCode = error.code || error.message;
       setError(errorCode);
+      
+      await Swal.fire({
+        icon: "error",
+        title: "Login Failed",
+        text: errorCode || "An error occurred during login",
+      });
     }
   };
 
@@ -54,10 +69,24 @@ const Login = () => {
         body: JSON.stringify({ idToken }),
         credentials: "include",
       });
-      alert(user.displayName || user.email || "User", "Logged in successfully");
+      
+      await Swal.fire({
+        icon: "success",
+        title: "Login Successful!",
+        text: `Welcome back, ${user.displayName || user.email || "User"}!`,
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      
       navigate(location.state ? location.state : "/");
     } catch (error) {
       setError(error.message || "Google login failed");
+      
+      await Swal.fire({
+        icon: "error",
+        title: "Google Login Failed",
+        text: error.message || "An error occurred during Google login",
+      });
     }
   };
 

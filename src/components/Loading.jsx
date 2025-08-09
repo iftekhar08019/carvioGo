@@ -6,7 +6,7 @@ import Lottie from "lottie-react";
 
 const Loading = () => {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-white">
+    <div className="flex items-center justify-center flex-1 bg-white">
      <div className="w-full max-w-md">
         <Lottie animationData={loadimg} loop={true} />
       </div>

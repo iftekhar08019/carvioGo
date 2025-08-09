@@ -2,6 +2,7 @@ import React, { useContext, useEffect } from "react";
 import logo from "../assets/logo.png";
 import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../provider/AuthProvider";
+import Swal from "sweetalert2";
 
 const Navbar = () => {
   const { user, logOut } = useContext(AuthContext);
@@ -10,9 +11,21 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       await logOut();
+      await Swal.fire({
+        icon: "success",
+        title: "Logged Out Successfully",
+        text: "You have been logged out successfully.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
       navigate("/");
     } catch (error) {
       console.error("Logout error:", error);
+      await Swal.fire({
+        icon: "error",
+        title: "Logout Failed",
+        text: "An error occurred during logout. Please try again.",
+      });
     }
   };
 
@@ -67,8 +80,8 @@ const Navbar = () => {
   };
 
   return (
-    <div className="bg-blue-500 sticky top-0 z-50 shadow-lg">
-      <nav className="relative px-4 py-4 flex items-center bg-white justify-between">
+    <div className="bg-white sticky top-0 z-50 shadow-lg">
+      <nav className="relative px-4 py-4 flex items-center bg-white justify-between lg:w-10/12 mx-auto">
         {/* Logo */}
         <Link to={"/"} className="text-3xl font-bold leading-none flex items-center gap-2">
           <img className="w-10" src={logo} alt="Logo" />

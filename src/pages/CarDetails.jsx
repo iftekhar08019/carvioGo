@@ -23,10 +23,34 @@ const CarDetails = () => {
     })
       .then((res) => res.json())
       .then((data) => setCar(data))
-      .catch((err) => console.error("Failed to fetch car details:", err));
+      .catch(async (err) => {
+        console.error("Failed to fetch car details:", err);
+        await Swal.fire({
+          icon: "error",
+          title: "Failed to Load Car Details",
+          text: "Unable to load car details. Please try again later.",
+        });
+      });
   }, [id]);
 
   const openBookingModal = () => {
+    console.log("Opening booking modal for car:", car);
+    if (!user) {
+      Swal.fire({
+        icon: "error",
+        title: "Not Logged In",
+        text: "You need to be logged in to book a car.",
+      });
+      return;
+    }
+    if (!car) {
+      Swal.fire({
+        icon: "error",
+        title: "Car Not Loaded",
+        text: "Car details are still loading. Please wait and try again.",
+      });
+      return;
+    }
     setIsModalOpen(true);
   };
 
@@ -38,7 +62,7 @@ const CarDetails = () => {
     try {
       const userEmail = user?.email;
       if (!userEmail) {
-        Swal.fire({
+        await Swal.fire({
           icon: "error",
           title: "Not Logged In",
           text: "You need to be logged in to book a car.",
@@ -46,37 +70,70 @@ const CarDetails = () => {
         return;
       }
 
+      console.log("Starting booking process for car:", id, "user:", userEmail);
+
+      // Show loading state
+      const loadingAlert = Swal.fire({
+        title: "Processing Booking...",
+        text: "Please wait while we process your booking.",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
       // Check if the user has already booked the car
+      const requestBody = { userEmail };
+      console.log("Sending booking request:", requestBody);
+
       const res = await fetch(`/api/cars/${id}/booking`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userEmail }), // Pass the userEmail in the request body
-        credentials: "include", // Include credentials for cookie-based auth
+        body: JSON.stringify(requestBody),
+        credentials: "include",
       });
 
+      console.log("Booking response status:", res.status);
+
+      // Close loading alert
+      loadingAlert.close();
+
       if (!res.ok) {
-        const error = await res.text();
-        if (error === "You have already booked this car") {
-          Swal.fire({
+        const errorText = await res.text();
+        console.error("Booking failed:", errorText);
+        
+        if (errorText.includes("already booked")) {
+          await Swal.fire({
             icon: "error",
             title: "Booking Failed",
             text: "You have already booked this car.",
           });
           return;
         } else {
-          throw new Error("Booking failed");
+          throw new Error(errorText || "Booking failed");
         }
       }
 
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch (error) {
+        console.error("Failed to parse response as JSON:", error);
+        data = { bookingCount: (car?.bookingCount || 0) + 1 };
+      }
+      
+      console.log("Booking successful:", data);
+      
       setCar((prevCar) => ({
         ...prevCar,
-        bookingCount: data.bookingCount,
+        bookingCount: data.bookingCount || (prevCar.bookingCount + 1),
       }));
 
-      Swal.fire({
+      await Swal.fire({
         icon: "success",
         title: "Booking Confirmed",
         text: "Your car has been successfully booked.",
@@ -86,11 +143,11 @@ const CarDetails = () => {
 
       closeBookingModal();
     } catch (error) {
-      console.error(error);
-      Swal.fire({
+      console.error("Booking error:", error);
+      await Swal.fire({
         icon: "error",
         title: "Booking Failed",
-        text: "Failed to book the car. Please try again.",
+        text: error.message || "Failed to book the car. Please try again.",
       });
     }
   };
@@ -190,8 +247,9 @@ const CarDetails = () => {
               <button
                 onClick={openBookingModal}
                 className="btn btn-primary flex items-center gap-2"
+                disabled={!user || !car}
               >
-                Book Now
+                {!user ? "Login to Book" : "Book Now"}
               </button>
             </div>
           </div>
@@ -199,7 +257,7 @@ const CarDetails = () => {
       </div>
 
       {/* Booking Confirmation Modal */}
-      {isModalOpen && (
+      {isModalOpen && car && (
         <>
           <input
             type="checkbox"
@@ -208,7 +266,7 @@ const CarDetails = () => {
             checked={isModalOpen}
             readOnly
           />
-          <div className="modal">
+          <div className="modal modal-open">
             <div className="modal-box relative max-w-3xl">
               <label
                 htmlFor="booking-modal"
@@ -236,7 +294,11 @@ const CarDetails = () => {
                 >
                   Cancel
                 </button>
-                <button onClick={handleBooking} className="btn btn-primary">
+                <button 
+                  onClick={handleBooking} 
+                  className="btn btn-primary"
+                  disabled={!user}
+                >
                   Confirm Booking
                 </button>
               </div>
