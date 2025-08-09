@@ -4,14 +4,22 @@ import {
   FaDollarSign,
   FaCheckCircle,
   FaTimesCircle,
+  FaMapMarkerAlt,
+  FaCalendarAlt,
+  FaUsers,
+  FaArrowLeft,
+  FaStar,
 } from "react-icons/fa";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import { AuthContext } from "../provider/AuthProvider";
 import Swal from "sweetalert2";
 import Loading from "../components/Loading";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 
 const CarDetails = () => {
-  const { id } = useParams(); // Fetching the car ID from the URL
+  const { id } = useParams();
+  const navigate = useNavigate();
   const { user } = useContext(AuthContext);
 
   const [car, setCar] = useState(null);
@@ -19,7 +27,6 @@ const CarDetails = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch the car details using the car ID
     setLoading(true);
     fetch(`/api/cars/${id}`, {
       credentials: "include",
@@ -42,7 +49,6 @@ const CarDetails = () => {
   }
 
   const openBookingModal = () => {
-    console.log("Opening booking modal for car:", car);
     if (!user) {
       Swal.fire({
         icon: "error",
@@ -78,9 +84,6 @@ const CarDetails = () => {
         return;
       }
 
-      console.log("Starting booking process for car:", id, "user:", userEmail);
-
-      // Show loading state
       const loadingAlert = Swal.fire({
         title: "Processing Booking...",
         text: "Please wait while we process your booking.",
@@ -92,9 +95,7 @@ const CarDetails = () => {
         },
       });
 
-      // Check if the user has already booked the car
       const requestBody = { userEmail };
-      console.log("Sending booking request:", requestBody);
 
       const res = await fetch(`/api/cars/${id}/booking`, {
         method: "PATCH",
@@ -105,14 +106,10 @@ const CarDetails = () => {
         credentials: "include",
       });
 
-      console.log("Booking response status:", res.status);
-
-      // Close loading alert
       loadingAlert.close();
 
       if (!res.ok) {
         const errorText = await res.text();
-        console.error("Booking failed:", errorText);
         
         if (errorText.includes("already booked")) {
           await Swal.fire({
@@ -133,8 +130,6 @@ const CarDetails = () => {
         console.error("Failed to parse response as JSON:", error);
         data = { bookingCount: (car?.bookingCount || 0) + 1 };
       }
-      
-      console.log("Booking successful:", data);
       
       setCar((prevCar) => ({
         ...prevCar,
@@ -174,146 +169,221 @@ const CarDetails = () => {
   } = car;
 
   return (
-    <div className="bg-gray-100 min-h-screen p-6">
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="lg:text-4xl text-xl font-bold text-center my-7">
-          {carModel}
-        </h1>
-
-        <div className="flex flex-col lg:flex-row mx-4 gap-8">
-          {/* Image Section */}
-          <div className="w-full md:w-1/2 px-4">
-            <img
-              src={image}
-              alt={carModel}
-              className="w-full h-auto rounded-lg shadow-md mb-4 object-cover max-h-[400px]"
-            />
-          </div>
-
-          {/* Details Section */}
-          <div className="w-full md:w-1/2 px-4">
-            <h2 className="text-3xl font-bold mb-2">{carModel}</h2>
-            <p className="text-xl text-gray-800 mb-4">
-              <FaDollarSign className="inline mr-2" />
-              {`${dailyRentalPrice}/day`}
-            </p>
-
-            <div className="flex items-center gap-4 mb-4">
-              <p
-                className={`text-sm flex items-center gap-2 ${
-                  availability === "Available"
-                    ? "text-green-600"
-                    : "text-red-600"
-                }`}
-              >
-                {availability === "Available" ? (
-                  <FaCheckCircle />
-                ) : (
-                  <FaTimesCircle />
-                )}
-                {availability}
-              </p>
-            </div>
-
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold mb-1">Features:</h3>
-              <ul className="flex flex-wrap gap-3">
-                {features?.length > 0 ? (
-                  features.map((feature, index) => (
-                    <li
-                      key={index}
-                      className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm"
-                    >
-                      {feature}
-                    </li>
-                  ))
-                ) : (
-                  <li className="text-gray-500">No features listed</li>
-                )}
-              </ul>
-            </div>
-
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-1">Description:</h3>
-              <p className="whitespace-pre-wrap text-gray-700">{description}</p>
-            </div>
-
-            <div className="mb-4">
-              <p className="text-sm text-gray-600">
-                <span className="font-semibold">Location:</span> {location}
-              </p>
-            </div>
-
-            <div className="mb-6">
-              <p className="text-sm text-gray-600">
-                <span className="font-semibold">Booking Count:</span>{" "}
-                {bookingCount}
-              </p>
-            </div>
-
-            <div className="flex justify-center">
-              <button
-                onClick={openBookingModal}
-                className="btn btn-primary flex items-center gap-2"
-                disabled={!user || !car}
-              >
-                {!user ? "Login to Book" : "Book Now"}
-              </button>
-            </div>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 relative overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-40 left-40 w-80 h-80 bg-pink-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
       </div>
 
-      {/* Booking Confirmation Modal */}
-      {isModalOpen && car && (
-        <>
-          <input
-            type="checkbox"
-            id="booking-modal"
-            className="modal-toggle"
-            checked={isModalOpen}
-            readOnly
-          />
-          <div className="modal modal-open">
-            <div className="modal-box relative max-w-3xl">
-              <label
-                htmlFor="booking-modal"
-                className="btn btn-sm btn-circle absolute right-4 top-4"
+      <div className="relative z-10">
+        {/* Back Button */}
+        <motion.div
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6 }}
+          className="absolute top-6 left-6 z-20"
+        >
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 text-gray-700 hover:text-blue-600"
+          >
+            <FaArrowLeft className="text-sm" />
+            <span>Back</span>
+          </button>
+        </motion.div>
+
+        <div className="container mx-auto px-4 py-8 pt-20">
+          {/* Header Section */}
+          <motion.div
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-12"
+          >
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              {carModel}
+            </h1>
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold ${
+                availability === "Available" 
+                  ? "bg-green-100 text-green-700" 
+                  : "bg-red-100 text-red-700"
+              }`}>
+                {availability === "Available" ? <FaCheckCircle /> : <FaTimesCircle />}
+                {availability}
+              </div>
+              <div className="flex items-center gap-1">
+                {[...Array(5)].map((_, i) => (
+                  <FaStar key={i} className="text-yellow-400 w-4 h-4" />
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+          <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto">
+            {/* Image Section */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="w-full lg:w-1/2"
+            >
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 overflow-hidden">
+                <img
+                  src={image}
+                  alt={carModel}
+                  className="w-full h-96 lg:h-[500px] object-cover hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+            </motion.div>
+
+            {/* Details Section */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="w-full lg:w-1/2"
+            >
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8">
+                {/* Price Section */}
+                <div className="mb-6">
+                  <div className="flex items-center gap-2 mb-2">
+                    <FaDollarSign className="text-2xl text-blue-500" />
+                    <span className="text-3xl font-bold text-gray-800">
+                      ${dailyRentalPrice}
+                    </span>
+                    <span className="text-gray-600">/day</span>
+                  </div>
+                </div>
+
+                {/* Key Information */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  <div className="flex items-center gap-3 p-3 bg-blue-50/50 rounded-xl">
+                    <FaMapMarkerAlt className="text-blue-500" />
+                    <div>
+                      <p className="text-sm text-gray-600">Location</p>
+                      <p className="font-semibold text-gray-800">{location}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-green-50/50 rounded-xl">
+                    <FaUsers className="text-green-500" />
+                    <div>
+                      <p className="text-sm text-gray-600">Bookings</p>
+                      <p className="font-semibold text-gray-800">{bookingCount}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Features Section */}
+                <div className="mb-6">
+                  <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <FaCar className="text-blue-500" />
+                    Features
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {features?.length > 0 ? (
+                      features.map((feature, index) => (
+                        <motion.span
+                          key={index}
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ duration: 0.3, delay: index * 0.1 }}
+                          className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg"
+                        >
+                          {feature}
+                        </motion.span>
+                      ))
+                    ) : (
+                      <span className="text-gray-500">No features listed</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Description Section */}
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-gray-800 mb-4">Description</h3>
+                  <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                    {description || "No description available."}
+                  </p>
+                </div>
+
+                {/* Book Now Button */}
+                <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.6 }}
+                  className="text-center"
+                >
+                  <button
+                    onClick={openBookingModal}
+                    className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-4 px-8 rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    disabled={!user || !car}
+                  >
+                    {!user ? "Login to Book" : "Book Now"}
+                  </button>
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Booking Confirmation Modal */}
+        {isModalOpen && car && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={closeBookingModal}></div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 50 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="relative bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 p-8 max-w-md w-full"
+            >
+              <button
                 onClick={closeBookingModal}
+                className="absolute top-4 right-4 w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors duration-200"
               >
                 ✕
-              </label>
+              </button>
 
-              <h3 className="text-lg font-bold mb-4">Confirm Booking</h3>
-              <p className="mb-4">You are about to book the following car:</p>
-
-              <div className="space-y-2 mb-6">
-                <p className="text-lg font-semibold">Car Model: {carModel}</p>
-                <p className="text-lg font-semibold">
-                  Price Per Day: ${dailyRentalPrice}
-                </p>
-                <p className="text-lg font-semibold">Location: {location}</p>
+              <h3 className="text-2xl font-bold mb-6 text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Confirm Booking
+              </h3>
+              
+              <div className="space-y-4 mb-8">
+                <div className="flex items-center justify-between p-4 bg-blue-50/50 rounded-xl">
+                  <span className="font-semibold text-gray-700">Car Model:</span>
+                  <span className="text-gray-800">{carModel}</span>
+                </div>
+                <div className="flex items-center justify-between p-4 bg-green-50/50 rounded-xl">
+                  <span className="font-semibold text-gray-700">Price Per Day:</span>
+                  <span className="text-gray-800">${dailyRentalPrice}</span>
+                </div>
+                <div className="flex items-center justify-between p-4 bg-purple-50/50 rounded-xl">
+                  <span className="font-semibold text-gray-700">Location:</span>
+                  <span className="text-gray-800">{location}</span>
+                </div>
               </div>
 
-              <div className="flex justify-end gap-4">
+              <div className="flex gap-4">
                 <button
                   onClick={closeBookingModal}
-                  className="btn btn-secondary"
+                  className="flex-1 px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-all duration-200"
                 >
                   Cancel
                 </button>
                 <button 
                   onClick={handleBooking} 
-                  className="btn btn-primary"
+                  className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-3 px-6 rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl"
                   disabled={!user}
                 >
                   Confirm Booking
                 </button>
               </div>
-            </div>
+            </motion.div>
           </div>
-        </>
-      )}
+        )}
+      </div>
     </div>
   );
 };

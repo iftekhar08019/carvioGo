@@ -1,17 +1,18 @@
 import React, { useContext, useState, useEffect } from "react";
-import { FaUserAlt } from "react-icons/fa";
-import { FaGoogle, FaPhotoFilm } from "react-icons/fa6";
+import { FaUserAlt, FaGoogle, FaImage, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaCar, FaArrowRight } from "react-icons/fa";
 import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../provider/AuthProvider";
 import Swal from "sweetalert2";
 import Loading from "../components/Loading";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 
 const Registration = () => {
-  const { createUser, setUser, updateUser, googleSignIn } =
-    useContext(AuthContext);
+  const { createUser, setUser, updateUser, googleSignIn } = useContext(AuthContext);
   const [error, setError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -40,7 +41,6 @@ const Registration = () => {
     return "";
   };
 
-  // ---- FIREBASE TOKEN-BASED REGISTRATION ----
   const handleRegister = async (e) => {
     e.preventDefault();
     const form = e.target;
@@ -62,23 +62,21 @@ const Registration = () => {
     setPasswordError("");
 
     try {
-      // 1. Register user with Firebase
       const result = await createUser(email, password);
       const user = result.user;
       await updateUser({ displayName: name, photoURL: photo });
-      // 2. Get JWT token from Firebase
       const idToken = await user.getIdToken();
-      // 3. Call backend to verify, set HTTP-only cookie, and create user record
+      
       const response = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // crucial for http-only cookies
+        credentials: "include",
         body: JSON.stringify({ idToken }),
       });
       if (!response.ok) {
         throw new Error("Failed to login/register (token not accepted)");
       }
-      await response.json(); // Consume the response
+      await response.json();
       setUser({ ...user, displayName: name, photoURL: photo });
       
       await Swal.fire({
@@ -104,9 +102,8 @@ const Registration = () => {
     try {
       const result = await googleSignIn();
       const user = result.user;
-      // 1. Get Firebase JWT
       const idToken = await user.getIdToken();
-      // 2. Send token to backend login endpoint (creates user/cookie)
+      
       const response = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -136,135 +133,184 @@ const Registration = () => {
   };
 
   return (
-    <div className="w-11/12 mx-auto px-4 shadow-2xl my-10 rounded-2xl">
-      <div className="flex flex-col items-center space-y-8">
-        <h1 className="lg:text-4xl text-xl font-bold text-center mt-15">
-          Register to Carvio<span className="text-yellow-800">Go</span>
-        </h1>
-        <div className="lg:w-1/2 text-center px-8 md:px-32 lg:px-24 my-8">
-          <form
-            onSubmit={handleRegister}
-            className="bg-white rounded-md shadow-2xl p-5"
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 relative overflow-hidden flex items-center justify-center p-4">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-40 left-40 w-80 h-80 bg-pink-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+      </div>
+
+      <div className="relative z-10 w-full max-w-md">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-8"
+        >
+          {/* Header Section */}
+          <motion.div
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-center mb-8"
           >
-            <h1 className="text-gray-800 font-bold text-2xl mb-1">
-              Hello There
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full shadow-lg mb-4">
+              <FaCar className="text-2xl text-white" />
+            </div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+              Join CarvioGO
             </h1>
-            <p className="text-sm font-normal text-gray-600 mb-8">
-              Welcome to Carvio<span className="text-yellow-800">Go</span>
-            </p>
+            <p className="text-gray-600">Create your account and start your journey</p>
+          </motion.div>
 
-            <div className="flex items-center border-2 mb-5 py-2 px-3 rounded-2xl border-blue-500 text-black">
-              <FaUserAlt />
-              <input
-                className="pl-2 w-full outline-none border-none"
-                type="text"
-                name="name"
-                placeholder="Name"
-                required
-              />
-            </div>
-            {/* {nameError && <p className="text-xs text-red-500">{nameError}</p>} */}
-
-            <div className="flex items-center border-2 mb-5 py-2 px-3 rounded-2xl border-blue-500 text-black bg-transparent">
-              <svg
-                className="h-5 w-5 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M16 12a4 4 0 10-8 0..."
+          {/* Form */}
+          <motion.form
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            onSubmit={handleRegister}
+            className="space-y-6"
+          >
+            {/* Name Input */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Full Name</label>
+              <div className="relative">
+                <FaUserAlt className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm"
+                  type="text"
+                  name="name"
+                  placeholder="Enter your full name"
+                  required
                 />
-              </svg>
-              <input
-                className="pl-2 w-full outline-none border-none"
-                type="email"
-                name="email"
-                placeholder="Email Address"
-                required
-              />
-            </div>
-
-            <div className="flex items-center border-2 mb-5 py-2 px-3 rounded-2xl border-blue-500 text-black">
-              <FaPhotoFilm />
-              <input
-                className="pl-2 w-full outline-none border-none"
-                type="text"
-                name="photo"
-                placeholder="Photo URL"
-              />
-            </div>
-
-            <div className="flex items-center border-2 mb-5 py-2 px-3 rounded-2xl border-blue-500 text-black">
-              <svg
-                className="h-5 w-5 text-gray-400"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M5 9V7a5 5 0 0110 0v2..."
-                  clipRule="evenodd"
-                />
-              </svg>
-              <input
-                className="pl-2 w-full outline-none border-none"
-                type="password"
-                name="password"
-                placeholder="Password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            {passwordError && (
-              <p className="text-xs text-red-500">{passwordError}</p>
-            )}
-            {error && <p className="text-red-400 text-xs">{error}</p>}
-
-            <button
-              onClick={handleGoogleSignIn}
-              type="button"
-              className="block border-2 border-black w-full mt-5 py-2 rounded-2xl hover:bg-gray-300 hover:-translate-y-1 transition-all duration-500 text-black font-semibold mb-2"
-            >
-              <FaGoogle className="inline" /> Register with Google
-            </button>
-
-            <button
-              type="submit"
-              className="group w-full relative inline-flex h-[56px] items-center justify-center rounded-full bg-neutral-950 py-1 pl-6 pr-14 font-medium text-neutral-50"
-            >
-              <span className="z-10 pr-2">Register</span>
-              <div className="absolute right-1 inline-flex h-12 w-12 items-center justify-end rounded-full bg-neutral-700 transition-[width] group-hover:w-[calc(100%-8px)]">
-                <div className="mr-3.5 flex items-center justify-center">
-                  <svg
-                    className="h-5 w-5 text-neutral-50"
-                    viewBox="0 0 15 15"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M8.146 3.146c.196-.195.512-.195.708 0l4 4a.5.5 0 010 .708l-4 4a.5.5 0 11-.708-.708L11.293 8H2.5a.5.5 0 010-1h8.793L8.146 3.854a.5.5 0 010-.708z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                </div>
               </div>
-            </button>
+            </div>
 
-            <div className="flex justify-between mt-4">
+            {/* Email Input */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Email Address</label>
+              <div className="relative">
+                <FaEnvelope className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm"
+                  type="email"
+                  name="email"
+                  placeholder="Enter your email"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Photo URL Input */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Photo URL (Optional)</label>
+              <div className="relative">
+                <FaImage className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm"
+                  type="text"
+                  name="photo"
+                  placeholder="Enter your photo URL"
+                />
+              </div>
+            </div>
+
+            {/* Password Input */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Password</label>
+              <div className="relative">
+                <FaLock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  className="w-full pl-12 pr-12 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm"
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Enter your password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
+            </div>
+
+            {/* Error Messages */}
+            {passwordError && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm"
+              >
+                {passwordError}
+              </motion.div>
+            )}
+
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm"
+              >
+                {error}
+              </motion.div>
+            )}
+
+            {/* Google Sign Up Button */}
+            <motion.button
+              type="button"
+              onClick={handleGoogleSignIn}
+              className="w-full flex items-center justify-center gap-3 py-3 px-6 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 hover:shadow-lg transition-all duration-300 font-semibold text-gray-700"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <FaGoogle className="text-red-500" />
+              Continue with Google
+            </motion.button>
+
+            {/* Divider */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white/90 text-gray-500">or</span>
+              </div>
+            </div>
+
+            {/* Register Button */}
+            <motion.button
+              type="submit"
+              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-3 px-6 rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <span>Create Account</span>
+              <FaArrowRight className="w-4 h-4" />
+            </motion.button>
+
+            {/* Links */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="text-center text-sm"
+            >
+              <span className="text-gray-600">Already have an account? </span>
               <Link
                 to="/login"
-                className="text-sm ml-2 text-black hover:text-blue-500 cursor-pointer hover:-translate-y-1 duration-500 transition-all"
+                className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors"
               >
-                Already have an account yet?
+                Sign In
               </Link>
-            </div>
-          </form>
-        </div>
+            </motion.div>
+          </motion.form>
+        </motion.div>
       </div>
     </div>
   );

@@ -1,12 +1,16 @@
 import React, { useContext, useEffect } from "react";
 import logo from "../assets/logo.png";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useLocation } from "react-router";
 import { AuthContext } from "../provider/AuthProvider";
 import Swal from "sweetalert2";
+import { FaCar, FaUser, FaSignOutAlt, FaSignInAlt, FaUserPlus, FaBars, FaTimes } from "react-icons/fa";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 
 const Navbar = () => {
   const { user, logOut } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = async () => {
     try {
@@ -59,99 +63,213 @@ const Navbar = () => {
     { name: "My Bookings", href: "/my-bookings" },
   ];
 
+  // Function to check if a link is active
+  const isActiveLink = (href) => {
+    if (href === "/") {
+      return location.pathname === "/";
+    }
+    return location.pathname === href || location.pathname.startsWith(href + "/");
+  };
+
   const renderLinks = () => {
     const allLinks = user ? [...commonLinks, ...loggedInLinks] : [...commonLinks];
     return allLinks.map((link, index) => (
-      <React.Fragment key={link.name}>
-        <li>
-          <a className="text-sm text-black hover:text-gray-500" href={link.href}>
-            {link.name}
-          </a>
-        </li>
-        {index !== allLinks.length - 1 && (
-          <li className="text-gray-300">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" className="w-4 h-4 current-fill" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 5v0m0 7v0m0 7v0m0-13a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-            </svg>
-          </li>
-        )}
-      </React.Fragment>
+      <motion.li
+        key={link.name}
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: index * 0.1 }}
+      >
+        <Link 
+          to={link.href} 
+          className={`px-4 py-2 rounded-xl transition-all duration-300 relative group ${
+            isActiveLink(link.href)
+              ? "text-white bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg shadow-blue-500/50 font-semibold"
+              : "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+          }`}
+        >
+          {link.name}
+          {isActiveLink(link.href) && (
+            <motion.div
+              layoutId="activeTab"
+              className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl -z-10"
+              transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+            />
+          )}
+        </Link>
+      </motion.li>
+    ));
+  };
+
+  const renderMobileLinks = () => {
+    const allLinks = user ? [...commonLinks, ...loggedInLinks] : [...commonLinks];
+    return allLinks.map((link) => (
+      <motion.li
+        key={link.name}
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Link 
+          to={link.href} 
+          className={`py-3 px-4 rounded-xl transition-all duration-300 ${
+            isActiveLink(link.href)
+              ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold shadow-lg shadow-blue-500/50"
+              : "text-gray-700 hover:bg-gray-50"
+          }`}
+        >
+          {link.name}
+        </Link>
+      </motion.li>
     ));
   };
 
   return (
-    <div className="bg-white sticky top-0 z-50 shadow-lg">
-      <nav className="relative px-4 py-4 flex items-center bg-white justify-between lg:w-10/12 mx-auto">
+    <div className="bg-white sticky top-0 z-50 shadow-lg border-b border-gray-200">
+      <nav className="relative px-4 py-4 flex items-center justify-between lg:w-10/12 mx-auto">
         {/* Logo */}
-        <Link to={"/"} className="text-3xl font-bold leading-none flex items-center gap-2">
-          <img className="w-10" src={logo} alt="Logo" />
-          <h1 className="text-xl">Carvio<span className="text-yellow-800">GO</span></h1>
-        </Link>
+        <motion.div
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <Link to={"/"} className="flex items-center gap-3 group">
+            <div className="relative">
+              <img className="w-12 h-12 object-contain" src={logo} alt="Logo" />
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+            </div>
+            <div className="flex flex-col">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Carvio<span className="text-yellow-600">GO</span>
+              </h1>
+              <p className="text-xs text-gray-500 -mt-1">Drive Your Dreams</p>
+            </div>
+          </Link>
+        </motion.div>
 
         {/* Center Nav Menu */}
-        <ul className="hidden lg:flex lg:items-center lg:space-x-6 absolute left-1/2 transform -translate-x-1/2">
+        <ul className="hidden lg:flex lg:items-center lg:space-x-4 absolute left-1/2 transform -translate-x-1/2">
           {renderLinks()}
         </ul>
 
         {/* Desktop Right Auth Buttons */}
-        <div className="hidden lg:flex items-center gap-3 ml-auto">
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6 }}
+          className="hidden lg:flex items-center gap-3 ml-auto"
+        >
           {user ? (
-            <button onClick={handleLogout} className="bg-white hover:bg-gray-100 text-red-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
+            <motion.button
+              onClick={handleLogout}
+              className="flex items-center gap-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-2 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <FaSignOutAlt className="w-4 h-4" />
               Logout
-            </button>
+            </motion.button>
           ) : (
             <>
-              <Link className="py-2 px-4 bg-gray-50 hover:bg-gray-100 text-sm text-gray-900 font-bold rounded-xl" to={"/login"}>Sign In</Link>
-              <Link className="py-2 px-4 bg-blue-500 hover:bg-blue-600 text-sm text-white font-bold rounded-xl" to={"/register"}>Sign Up</Link>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Link
+                  className="flex items-center gap-2 py-2 px-6 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200"
+                  to={"/login"}
+                >
+                  <FaSignInAlt className="w-4 h-4" />
+                  Sign In
+                </Link>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Link
+                  className="flex items-center gap-2 py-2 px-6 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                  to={"/register"}
+                >
+                  <FaUserPlus className="w-4 h-4" />
+                  Sign Up
+                </Link>
+              </motion.div>
             </>
           )}
-        </div>
+        </motion.div>
 
         {/* Mobile Burger */}
-        <div className="lg:hidden ml-auto">
-          <button className="navbar-burger flex items-center text-blue-600 p-3">
-            <svg className="block h-4 w-4 fill-current" viewBox="0 0 20 20">
-              <title>Mobile menu</title>
-              <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"></path>
-            </svg>
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6 }}
+          className="lg:hidden ml-auto"
+        >
+          <button className="navbar-burger flex items-center justify-center w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+            <FaBars className="w-5 h-5" />
           </button>
-        </div>
+        </motion.div>
       </nav>
 
       {/* Mobile Menu */}
       <div className="navbar-menu relative z-50 hidden">
-        <div className="navbar-backdrop fixed inset-0 bg-gray-800 opacity-25"></div>
-        <nav className="fixed top-0 left-0 bottom-0 flex flex-col w-5/6 max-w-sm py-6 px-6 bg-white border-r overflow-y-auto">
-          <div className="flex items-center mb-8">
-            <a className="mr-auto text-2xl font-bold leading-none flex items-center gap-2" href="#">
-              <img className="w-10" src={logo} alt="Logo" />
-              Carvio<span className="text-yellow-800">GO</span>
-            </a>
-            <button className="navbar-close">
-              <svg className="h-6 w-6 text-black hover:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+        <div className="navbar-backdrop fixed inset-0 bg-black/50"></div>
+        <motion.nav
+          initial={{ opacity: 0, x: "100%" }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3 }}
+          className="fixed top-0 right-0 bottom-0 flex flex-col w-5/6 max-w-sm py-6 px-6 bg-white border-l border-gray-200 overflow-y-auto shadow-2xl"
+        >
+          <div className="flex items-center justify-between mb-8">
+            <Link to="/" className="flex items-center gap-3">
+              <img className="w-10 h-10" src={logo} alt="Logo" />
+              <div>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  Carvio<span className="text-yellow-600">GO</span>
+                </h1>
+                <p className="text-xs text-gray-500">Drive Your Dreams</p>
+              </div>
+            </Link>
+            <button className="navbar-close w-10 h-10 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300">
+              <FaTimes className="w-5 h-5" />
             </button>
           </div>
 
-          <ul className="space-y-2">
-            {renderLinks()}
+          <ul className="space-y-3 flex-1">
+            {renderMobileLinks()}
           </ul>
 
-          <div className="mt-auto pt-6">
+          <div className="mt-auto pt-6 border-t border-gray-200">
             {user ? (
-              <button onClick={handleLogout} className="bg-white hover:bg-gray-100 text-red-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
+              <motion.button
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <FaSignOutAlt className="w-4 h-4" />
                 Logout
-              </button>
+              </motion.button>
             ) : (
-              <div className="flex gap-2">
-                <a className="flex-1 px-4 py-3 text-center bg-gray-50 hover:bg-gray-100 text-sm font-semibold rounded-xl" href="/login">Sign In</a>
-                <a className="flex-1 px-4 py-3 text-center bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl" href="/register">Sign Up</a>
+              <div className="flex gap-3">
+                <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Link
+                    className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200"
+                    to="/login"
+                  >
+                    <FaSignInAlt className="w-4 h-4" />
+                    Sign In
+                  </Link>
+                </motion.div>
+                <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Link
+                    className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                    to="/register"
+                  >
+                    <FaUserPlus className="w-4 h-4" />
+                    Sign Up
+                  </Link>
+                </motion.div>
               </div>
             )}
-            <p className="my-4 text-xs text-center text-black">© 2025 CarvioGO</p>
+            <p className="mt-4 text-xs text-center text-gray-500">© 2025 CarvioGO</p>
           </div>
-        </nav>
+        </motion.nav>
       </div>
     </div>
   );
