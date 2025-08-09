@@ -7,6 +7,7 @@ import Lottie from "lottie-react";
 import carAnimation from "../assets/car.json";
 import { AuthContext } from "../provider/AuthProvider";
 import Loading from "../components/Loading";
+import { apiRequest } from "../config/api";
 
 const AddCarPage = () => {
   const { user } = useContext(AuthContext);
@@ -93,23 +94,10 @@ const AddCarPage = () => {
     try {
       console.log("Sending car data:", carData); // Debug log
 
-      const res = await fetch("/api/cars", {
+      await apiRequest("cars", {
         method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify(carData),
-        credentials: "include",
       });
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Server response:", errorText); // Debug log
-        throw new Error(`Failed to add car: ${res.status} - ${errorText}`);
-      }
-
-      const result = await res.json();
-      console.log("Success response:", result); // Debug log
 
       await Swal.fire({
         title: "Success!",
@@ -222,7 +210,7 @@ const AddCarPage = () => {
                         onChange={handleChange}
                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm"
                         type="text"
-                        placeholder="e.g., Toyota Camry"
+                        placeholder="e.g., Toyota Camry 2023"
                         required
                       />
                     </div>
@@ -230,7 +218,7 @@ const AddCarPage = () => {
 
                   {/* Daily Rental Price */}
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">Daily Rental Price</label>
+                    <label className="block text-sm font-medium text-gray-700">Daily Rental Price ($)</label>
                     <div className="relative">
                       <FaDollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                       <input
@@ -239,7 +227,9 @@ const AddCarPage = () => {
                         onChange={handleChange}
                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm"
                         type="number"
-                        placeholder="0.00"
+                        min="0"
+                        step="0.01"
+                        placeholder="e.g., 50.00"
                         required
                       />
                     </div>
@@ -250,21 +240,23 @@ const AddCarPage = () => {
                     <label className="block text-sm font-medium text-gray-700">Availability</label>
                     <div className="relative">
                       <FaCalendarAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                      <input
+                      <select
                         name="availability"
                         value={formData.availability}
                         onChange={handleChange}
                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm"
-                        type="text"
-                        placeholder="e.g., Available Now"
                         required
-                      />
+                      >
+                        <option value="">Select availability</option>
+                        <option value="Available">Available</option>
+                        <option value="Not Available">Not Available</option>
+                      </select>
                     </div>
                   </div>
 
-                  {/* Registration Number */}
+                  {/* Vehicle Registration Number */}
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">Registration Number</label>
+                    <label className="block text-sm font-medium text-gray-700">Vehicle Registration Number</label>
                     <div className="relative">
                       <FaCogs className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                       <input
@@ -372,26 +364,6 @@ const AddCarPage = () => {
                     </motion.label>
                   ))}
                 </div>
-              </motion.div>
-
-              {/* Booking Count Section */}
-              <motion.div
-                initial={{ opacity: 0, x: -50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 1.0 }}
-                className="space-y-2"
-              >
-                <label className="block text-sm font-medium text-gray-700">Initial Booking Count</label>
-                <input
-                  type="number"
-                  name="bookingCount"
-                  value={formData.bookingCount}
-                  readOnly
-                  disabled
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50/80 text-gray-500 cursor-not-allowed backdrop-blur-sm"
-                  placeholder="0"
-                />
-                <p className="text-sm text-gray-500">This will be set to 0 for new cars</p>
               </motion.div>
 
               {/* Submit Button */}

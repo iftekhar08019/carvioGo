@@ -8,6 +8,7 @@ import { Link, useNavigate } from "react-router";
 import Loading from "../components/Loading";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import { apiRequest } from "../config/api";
 
 const MyBookings = () => {
   const { user } = useContext(AuthContext);
@@ -29,14 +30,7 @@ const MyBookings = () => {
   useEffect(() => {
     if (user?.email) {
       setLoading(true);
-      fetch(`/api/bookings?email=${user.email}`, { credentials: "include" })
-        .then(async (res) => {
-          if (!res.ok) {
-            const err = await res.json();
-            throw new Error(err.error || res.statusText);
-          }
-          return res.json();
-        })
+      apiRequest(`bookings?email=${user.email}`)
         .then(setBookings)
         .catch(async (err) => {
           console.error("Failed to load bookings:", err);

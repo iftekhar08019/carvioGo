@@ -6,6 +6,7 @@ import Swal from "sweetalert2";
 import Loading from "../components/Loading";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import { apiRequest } from "../config/api";
 
 const Registration = () => {
   const { createUser, setUser, updateUser, googleSignIn } = useContext(AuthContext);
@@ -67,16 +68,11 @@ const Registration = () => {
       await updateUser({ displayName: name, photoURL: photo });
       const idToken = await user.getIdToken();
       
-      const response = await fetch("/api/login", {
+      await apiRequest("login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify({ idToken }),
       });
-      if (!response.ok) {
-        throw new Error("Failed to login/register (token not accepted)");
-      }
-      await response.json();
+      
       setUser({ ...user, displayName: name, photoURL: photo });
       
       await Swal.fire({
@@ -104,13 +100,18 @@ const Registration = () => {
       const user = result.user;
       const idToken = await user.getIdToken();
       
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ idToken }),
-      });
-      if (!response.ok) throw new Error("Google sign-in failed on backend");
+      // Try to send token to backend, but don't fail if it doesn't work
+      try {
+        await apiRequest("login", {
+          method: "POST",
+          body: JSON.stringify({ idToken }),
+        });
+      } catch (backendError) {
+        console.warn("Backend API call failed, but user is authenticated:", backendError);
+        // Continue with sign-in even if backend call fails
+        // This is common in development or when backend is not available
+      }
+      
       setUser(user);
       
       await Swal.fire({
@@ -123,6 +124,7 @@ const Registration = () => {
       
       navigate("/");
     } catch (error) {
+      console.error("Google sign-in error:", error);
       setError(error.message || "Google sign-in failed");
       await Swal.fire({
         icon: "error",

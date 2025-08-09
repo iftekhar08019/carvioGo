@@ -6,6 +6,7 @@ import Swal from "sweetalert2";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import CarCard from "../components/CarCard";
+import { apiRequest } from "../config/api";
 
 const AvailableCars = () => {
   const [cars, setCars] = useState([]);
@@ -17,10 +18,7 @@ const AvailableCars = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch("/api/available-cars", {
-      credentials: "include",
-    })
-      .then((res) => res.json())
+    apiRequest("available-cars")
       .then((data) => setCars(data))
       .catch(async (err) => {
         console.error("Failed to load cars:", err);

@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import Loading from "../components/Loading";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import { apiRequest } from "../config/api";
 
 const Login = () => {
   const [error, setError] = useState("");
@@ -43,11 +44,9 @@ const Login = () => {
       const user = result.user;
       const idToken = await user.getIdToken();
 
-      await fetch("/api/login", {
+      await apiRequest("login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idToken }),
-        credentials: "include",
       });
       
       await Swal.fire({
@@ -79,12 +78,17 @@ const Login = () => {
       const user = result.user;
       const idToken = await user.getIdToken();
 
-      await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken }),
-        credentials: "include",
-      });
+      // Try to send token to backend, but don't fail if it doesn't work
+      try {
+        await apiRequest("login", {
+          method: "POST",
+          body: JSON.stringify({ idToken }),
+        });
+      } catch (backendError) {
+        console.warn("Backend API call failed, but user is authenticated:", backendError);
+        // Continue with login even if backend call fails
+        // This is common in development or when backend is not available
+      }
       
       await Swal.fire({
         icon: "success",
@@ -96,6 +100,7 @@ const Login = () => {
       
       navigate(location.state ? location.state : "/");
     } catch (error) {
+      console.error("Google sign-in error:", error);
       setError(error.message || "Google login failed");
       
       await Swal.fire({

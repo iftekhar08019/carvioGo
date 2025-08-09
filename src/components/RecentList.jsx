@@ -6,6 +6,7 @@ import Loading from "./Loading";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { FaCar, FaArrowRight } from "react-icons/fa";
+import { apiRequest } from "../config/api";
 
 const RecentList = () => {
   const [cars, setCars] = useState([]);
@@ -13,10 +14,7 @@ const RecentList = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch("/api/top-cars", {
-      credentials: "include",
-    })
-      .then((res) => res.json())
+    apiRequest("top-cars")
       .then((data) => {
         setCars(data);
       })

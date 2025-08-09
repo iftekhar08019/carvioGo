@@ -16,6 +16,7 @@ import Swal from "sweetalert2";
 import Loading from "../components/Loading";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import { apiRequest } from "../config/api";
 
 const CarDetails = () => {
   const { id } = useParams();
@@ -28,10 +29,7 @@ const CarDetails = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/cars/${id}`, {
-      credentials: "include",
-    })
-      .then((res) => res.json())
+    apiRequest(`cars/${id}`)
       .then((data) => setCar(data))
       .catch(async (err) => {
         console.error("Failed to fetch car details:", err);
@@ -97,61 +95,39 @@ const CarDetails = () => {
 
       const requestBody = { userEmail };
 
-      const res = await fetch(`/api/cars/${id}/booking`, {
+      await apiRequest(`cars/${id}/booking`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify(requestBody),
-        credentials: "include",
       });
 
       loadingAlert.close();
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        
-        if (errorText.includes("already booked")) {
-          await Swal.fire({
-            icon: "error",
-            title: "Booking Failed",
-            text: "You have already booked this car.",
-          });
-          return;
-        } else {
-          throw new Error(errorText || "Booking failed");
-        }
-      }
-
-      let data;
-      try {
-        data = await res.json();
-      } catch (error) {
-        console.error("Failed to parse response as JSON:", error);
-        data = { bookingCount: (car?.bookingCount || 0) + 1 };
-      }
-      
-      setCar((prevCar) => ({
-        ...prevCar,
-        bookingCount: data.bookingCount || (prevCar.bookingCount + 1),
-      }));
-
       await Swal.fire({
         icon: "success",
-        title: "Booking Confirmed",
-        text: "Your car has been successfully booked.",
-        timer: 2000,
+        title: "Booking Successful!",
+        text: `You have successfully booked the ${car.carModel}. We'll contact you shortly with more details.`,
+        timer: 3000,
         showConfirmButton: false,
       });
 
       closeBookingModal();
+      navigate("/my-bookings");
     } catch (error) {
       console.error("Booking error:", error);
-      await Swal.fire({
-        icon: "error",
-        title: "Booking Failed",
-        text: error.message || "Failed to book the car. Please try again.",
-      });
+      
+      if (error.message.includes("already booked")) {
+        await Swal.fire({
+          icon: "error",
+          title: "Booking Failed",
+          text: "You have already booked this car.",
+        });
+      } else {
+        await Swal.fire({
+          icon: "error",
+          title: "Booking Failed",
+          text: error.message || "Failed to book the car. Please try again.",
+        });
+      }
     }
   };
 

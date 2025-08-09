@@ -6,6 +6,7 @@ import Loading from "../components/Loading";
 import { Link, useNavigate } from "react-router";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import { apiRequest } from "../config/api";
 
 const initialCarState = {
   carModel: "",
@@ -31,10 +32,7 @@ const MyCars = () => {
   useEffect(() => {
     if (user?.email) {
       setLoading(true);
-      fetch(`/api/cars?email=${user.email}`, {
-        credentials: "include",
-      })
-        .then((res) => res.json())
+      apiRequest(`cars?email=${user.email}`)
         .then((data) => setCars(data))
         .catch(async (err) => {
           console.error("Failed to fetch cars", err);
@@ -85,16 +83,10 @@ const MyCars = () => {
     e.preventDefault();
 
     try {
-      const res = await fetch(
-        `/api/cars/${editingCar._id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-          credentials: "include",
-        }
-      );
-      if (!res.ok) throw new Error("Update failed");
+      await apiRequest(`cars/${editingCar._id}`, {
+        method: "PUT",
+        body: JSON.stringify(formData),
+      });
 
       setCars((prev) =>
         prev.map((r) => (r._id === editingCar._id ? formData : r))
@@ -132,14 +124,9 @@ const MyCars = () => {
     if (!result.isConfirmed) return;
 
     try {
-      const res = await fetch(
-        `/api/cars/${id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
-      if (!res.ok) throw new Error("Delete failed");
+      await apiRequest(`cars/${id}`, {
+        method: "DELETE",
+      });
 
       setCars((prev) => prev.filter((r) => r._id !== id));
 
