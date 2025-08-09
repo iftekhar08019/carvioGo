@@ -41,6 +41,44 @@
 
 ---
 
+## 🚀 Auto-Push to GitHub
+
+This project includes an automated Git push script that makes it easy to commit and push changes to GitHub.
+
+### Quick Push
+After making changes to your code, simply run:
+```bash
+npm run push
+```
+
+Or use the script directly:
+```bash
+./git-push.sh
+```
+
+### Custom Commit Message
+You can also provide a custom commit message:
+```bash
+./git-push.sh "Your custom commit message"
+```
+
+### What the Script Does
+1. ✅ Checks if you're in a Git repository
+2. 📁 Shows which files have been changed
+3. ➕ Adds all changes to staging
+4. 💾 Commits with timestamp (or custom message)
+5. 🚀 Pushes to GitHub automatically
+6. 🔗 Provides feedback and repository link
+
+### Features
+- 🎨 Colored output for better readability
+- ⏰ Automatic timestamps
+- 🔍 Shows changed files before committing
+- 🛡️ Error handling and validation
+- 📊 Status feedback
+
+---
+
 ## 🧰 Technologies & npm Packages Used
 
 - **Framework**: React.js  
