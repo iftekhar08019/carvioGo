@@ -24,7 +24,7 @@ const MyCars = () => {
 
   useEffect(() => {
     if (user?.email) {
-      fetch(`https://carvio-go-server.vercel.app/cars?email=${user.email}`, {
+      fetch(`/api/cars?email=${user.email}`, {
         credentials: "include",
       })
         .then((res) => res.json())
@@ -63,7 +63,7 @@ const MyCars = () => {
 
     try {
       const res = await fetch(
-        `https://carvio-go-server.vercel.app/cars/${editingCar._id}`,
+        `/api/cars/${editingCar._id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -110,7 +110,7 @@ const MyCars = () => {
 
     try {
       const res = await fetch(
-        `https://carvio-go-server.vercel.app/cars/${id}`,
+        `/api/cars/${id}`,
         {
           method: "DELETE",
           credentials: "include",

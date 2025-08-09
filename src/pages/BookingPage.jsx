@@ -24,7 +24,7 @@ const MyBookings = () => {
 
   useEffect(() => {
     if (user?.email) {
-      fetch(`https://carvio-go-server.vercel.app/bookings?email=${user.email}`, { credentials: "include" })
+      fetch(`/api/bookings?email=${user.email}`, { credentials: "include" })
         .then(async (res) => {
           if (!res.ok) {
             const err = await res.json();
@@ -50,7 +50,7 @@ const MyBookings = () => {
 
     try {
       const response = await fetch(
-        `https://carvio-go-server.vercel.app/bookings/${bookingId}/cancel`,
+        `/api/bookings/${bookingId}/cancel`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -99,7 +99,7 @@ const MyBookings = () => {
     }
     try {
       const res = await fetch(
-        `https://carvio-go-server.vercel.app/bookings/${currentBooking._id}/modify`,
+        `/api/bookings/${currentBooking._id}/modify`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },

@@ -8,7 +8,6 @@ const Registration = () => {
   const { createUser, setUser, updateUser, googleSignIn } =
     useContext(AuthContext);
   const [error, setError] = useState("");
-  const [nameError, setNameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -50,7 +49,7 @@ const Registration = () => {
       // 2. Get JWT token from Firebase
       const idToken = await user.getIdToken();
       // 3. Call backend to verify, set HTTP-only cookie, and create user record
-      const response = await fetch("https://carvio-go-server.vercel.app/login", {
+      const response = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include", // crucial for http-only cookies
@@ -59,7 +58,7 @@ const Registration = () => {
       if (!response.ok) {
         throw new Error("Failed to login/register (token not accepted)");
       }
-      const data = await response.json();
+      await response.json(); // Consume the response
       setUser({ ...user, displayName: name, photoURL: photo });
       navigate("/");
     } catch (error) {
@@ -74,7 +73,7 @@ const Registration = () => {
       // 1. Get Firebase JWT
       const idToken = await user.getIdToken();
       // 2. Send token to backend login endpoint (creates user/cookie)
-      const response = await fetch("https://carvio-go-server.vercel.app/login", {
+      const response = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -116,7 +115,7 @@ const Registration = () => {
                 required
               />
             </div>
-            {nameError && <p className="text-xs text-red-500">{nameError}</p>}
+            {/* {nameError && <p className="text-xs text-red-500">{nameError}</p>} */}
 
             <div className="flex items-center border-2 mb-5 py-2 px-3 rounded-2xl border-blue-500 text-black bg-transparent">
               <svg

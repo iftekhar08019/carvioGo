@@ -25,7 +25,7 @@ const Login = () => {
       const idToken = await user.getIdToken(); // <-- Get Firebase JWT
 
       // Send idToken to backend to create a secure session (cookie)
-      await fetch("https://carvio-go-server.vercel.app/login", {
+      await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idToken }),
@@ -48,7 +48,7 @@ const Login = () => {
       const idToken = await user.getIdToken(); // <-- Get Firebase JWT
 
       // Send idToken to backend to create a secure session (cookie)
-      await fetch("https://carvio-go-server.vercel.app/login", {
+      await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idToken }),

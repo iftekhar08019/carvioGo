@@ -6,7 +6,7 @@ const RecentList = () => {
   const [cars, setCars] = useState([]);
 
   useEffect(() => {
-    fetch("https://carvio-go-server.vercel.app/top-cars", {
+    fetch("/api/top-cars", {
       credentials: "include",
     })
       .then((res) => res.json())
