@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { AuthContext } from "../provider/AuthProvider";
+import Loading from "../components/Loading";
 
 const initialCarState = {
   carModel: "",
@@ -21,9 +22,11 @@ const MyCars = () => {
   const [editingCar, setEditingCar] = useState(null);
   const [formData, setFormData] = useState(initialCarState);
   const [sortBy, setSortBy] = useState("date-desc"); // default: newest first
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user?.email) {
+      setLoading(true);
       fetch(`/api/cars?email=${user.email}`, {
         credentials: "include",
       })
@@ -36,9 +39,18 @@ const MyCars = () => {
             title: "Failed to Load Cars",
             text: "Unable to load your cars. Please try again later.",
           });
-        });
+        })
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
     }
   }, [user?.email]);
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (!user) return <p className="text-center p-10">Loading user info...</p>;
 
   const openEditModal = (car) => {
     setEditingCar(car);
@@ -143,8 +155,6 @@ const MyCars = () => {
       });
     }
   };
-
-  if (!user) return <p className="text-center p-10">Loading user info...</p>;
 
   const sortedCars = [...cars].sort((a, b) => {
     if (sortBy === "date-desc") {

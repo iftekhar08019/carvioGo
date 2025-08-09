@@ -1,16 +1,30 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { FaGoogle } from "react-icons/fa";
 import { Link, useNavigate } from "react-router";
 import { useLocation } from "react-router";
 import { AuthContext } from "../provider/AuthProvider";
 import Swal from "sweetalert2";
+import Loading from "../components/Loading";
 
 const Login = () => {
   const [error, setError] = useState("");
   const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const { signIn, googleSignIn } = useContext(AuthContext);
   const location = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   // Handle login
   const handleLogin = async (e) => {

@@ -6,6 +6,7 @@ import Swal from "sweetalert2";
 import { AuthContext } from "../provider/AuthProvider";
 import { Link } from "react-router";
 import { FaDollarSign } from "react-icons/fa";
+import Loading from "../components/Loading";
 
 const MyBookings = () => {
   const { user } = useContext(AuthContext);
@@ -14,6 +15,7 @@ const MyBookings = () => {
   const [currentBooking, setCurrentBooking] = useState(null);
   const [dateRange, setDateRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
+  const [loading, setLoading] = useState(true);
 
   const fmt = (d) =>
     new Date(d).toLocaleString("en-GB", {
@@ -24,6 +26,7 @@ const MyBookings = () => {
 
   useEffect(() => {
     if (user?.email) {
+      setLoading(true);
       fetch(`/api/bookings?email=${user.email}`, { credentials: "include" })
         .then(async (res) => {
           if (!res.ok) {
@@ -40,9 +43,16 @@ const MyBookings = () => {
             title: "Failed to Load Bookings",
             text: "Unable to load your bookings. Please try again later.",
           });
-        });
+        })
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
     }
   }, [user?.email]);
+
+  if (loading) {
+    return <Loading />;
+  }
 
   const handleCancelBooking = async (bookingId) => {
     const { isConfirmed } = await Swal.fire({

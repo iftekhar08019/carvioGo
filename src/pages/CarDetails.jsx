@@ -8,6 +8,7 @@ import {
 import { useParams } from "react-router";
 import { AuthContext } from "../provider/AuthProvider";
 import Swal from "sweetalert2";
+import Loading from "../components/Loading";
 
 const CarDetails = () => {
   const { id } = useParams(); // Fetching the car ID from the URL
@@ -15,9 +16,11 @@ const CarDetails = () => {
 
   const [car, setCar] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Fetch the car details using the car ID
+    setLoading(true);
     fetch(`/api/cars/${id}`, {
       credentials: "include",
     })
@@ -30,8 +33,13 @@ const CarDetails = () => {
           title: "Failed to Load Car Details",
           text: "Unable to load car details. Please try again later.",
         });
-      });
+      })
+      .finally(() => setLoading(false));
   }, [id]);
+
+  if (loading) {
+    return <Loading />;
+  }
 
   const openBookingModal = () => {
     console.log("Opening booking modal for car:", car);

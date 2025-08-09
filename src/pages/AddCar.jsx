@@ -1,7 +1,8 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import Swal from "sweetalert2";
 import { FaCar, FaDollarSign, FaCalendarAlt, FaMapMarkerAlt, FaRegImage, FaCogs } from "react-icons/fa";
 import { AuthContext } from "../provider/AuthProvider";
+import Loading from "../components/Loading";
 
 const AddCarPage = () => {
   const { user } = useContext(AuthContext); // get current logged-in user
@@ -16,6 +17,19 @@ const AddCarPage = () => {
     image: "",
     location: "",
   });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;

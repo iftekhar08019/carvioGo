@@ -1,9 +1,10 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { FaUserAlt } from "react-icons/fa";
 import { FaGoogle, FaPhotoFilm } from "react-icons/fa6";
 import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../provider/AuthProvider";
 import Swal from "sweetalert2";
+import Loading from "../components/Loading";
 
 const Registration = () => {
   const { createUser, setUser, updateUser, googleSignIn } =
@@ -11,7 +12,20 @@ const Registration = () => {
   const [error, setError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   const validatePassword = (password) => {
     const uppercase = /[A-Z]/;
